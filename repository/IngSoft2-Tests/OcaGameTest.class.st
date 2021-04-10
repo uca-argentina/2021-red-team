@@ -5,10 +5,26 @@ Class {
 }
 
 { #category : #tests }
-OcaGameTest >> testCreateADiceWithANumberOfFacesSuccessfully [
+OcaGameTest >> testCreateADieHandleSuccessfully [
+	
+	| aDieHandle |
+	aDieHandle := DieHandle withDie: (Die withFaces: 6).
+	
+	self assert: (aDieHandle numberOfDice) equals: 1.
+]
+
+{ #category : #tests }
+OcaGameTest >> testCreateADieWithANumberOfFacesSuccessfully [
 	| aDice |
-	aDice := Dice withFaces: 8.
+	aDice := Die withFaces: 8.
 	self assert: aDice faces equals: 8.
+]
+
+{ #category : #tests }
+OcaGameTest >> testCreateAGameWithANumberOfCellsAndADieSuccessfully [
+	| aGame |
+	aGame := Game withCells: 10.
+	self assert: aGame cells equals: 10.
 ]
 
 { #category : #tests }
@@ -26,15 +42,15 @@ OcaGameTest >> testCreateAPlayerWithNameSuccessfully [
 ]
 
 { #category : #tests }
-OcaGameTest >> testRollTheDiceSuccessfully [
+OcaGameTest >> testRollTheDieSuccessfully [
 	| aDice |
-	aDice := Dice withFaces: 8.
+	aDice := Die withFaces: 8.
 	self assert: aDice roll equals: 5.
 ]
 
 { #category : #tests }
-OcaGameTest >> testRollTheDiceUnsuccessfully [
+OcaGameTest >> testRollTheDieUnsuccessfully [
 	| aDice |
-	aDice := Dice withFaces: 3.
+	aDice := Die withFaces: 3.
 	self deny: aDice roll equals: 3.
 ]

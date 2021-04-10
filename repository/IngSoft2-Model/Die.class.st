@@ -1,5 +1,5 @@
 Class {
-	#name : #Dice,
+	#name : #Die,
 	#superclass : #Object,
 	#instVars : [
 		'faces'
@@ -8,23 +8,23 @@ Class {
 }
 
 { #category : #'instance creation' }
-Dice class >> withFaces: aNumberOfFaces [ 
+Die class >> withFaces: aNumberOfFaces [ 
 	^ self new initializeWithFaces: aNumberOfFaces.
 ]
 
 { #category : #'as yet unclassified' }
-Dice >> faces [
+Die >> faces [
 	^ faces.
 ]
 
 { #category : #initialize }
-Dice >> initializeWithFaces: aNumberOfFaces [
+Die >> initializeWithFaces: aNumberOfFaces [
 
 	faces := aNumberOfFaces.
 	
 ]
 
 { #category : #'as yet unclassified' }
-Dice >> roll [
+Die >> roll [
 	^ (faces//2)+1.
 ]
