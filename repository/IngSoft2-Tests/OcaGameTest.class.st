@@ -5,30 +5,6 @@ Class {
 }
 
 { #category : #tests }
-OcaGameTest >> testAddDiceToADieHandleSuccessfully [
-	
-	| aDieHandle die1 die2 |
-	aDieHandle := DieHandle withDie: (Die withFaces: 6).
-	
-	die1 := Die withFaces: 4.
-	die2 := Die withFaces: 8.
-	
-	aDieHandle addDie: die1;
-				addDie: die2.
-	
-	self assert: (aDieHandle numberOfDice) equals: 3.
-]
-
-{ #category : #tests }
-OcaGameTest >> testCreateADieHandleSuccessfully [
-	
-	| aDieHandle |
-	aDieHandle := DieHandle withDie: (Die withFaces: 6).
-	
-	self assert: (aDieHandle numberOfDice) equals: 1.
-]
-
-{ #category : #tests }
 OcaGameTest >> testCreateADieWithANumberOfFacesSuccessfully [
 	| aDice |
 	aDice := Die withFaces: 8.
@@ -36,31 +12,28 @@ OcaGameTest >> testCreateADieWithANumberOfFacesSuccessfully [
 ]
 
 { #category : #tests }
-OcaGameTest >> testCreateAGameWithANumberOfCellsAndADieHandleSuccessfully [
-	| aGame aDieHandle aBoard |
+OcaGameTest >> testCreateAGameAndPlayARound [
 	
+	| aDieHandle die1 die2 players aBoard aGame |
+	
+	players := OrderedCollection new.
+	players add: 'Cande';
+				add: 'Mateo';
+				 add: 'Barto'.
+		
 	aDieHandle := DieHandle withDie: (Die withFaces: 6).
-	aDieHandle addDie: (Die withFaces: 4);
-				addDie: (Die withFaces: 8).
-	aBoard := Board withCells: 10 andWithNumberOfPlayers: 3.
-				
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
 	
-	self assert: (aGame positionOfPlayer: 2) equals: 0.
-]
+	aDieHandle addDie: (Die withFaces: 8);
+				addDie: (Die withFaces: 4).
+	
+	aBoard := Board withCells: 100 andWithPlayers: players.
+	
+	aGame := Game withBoard: aBoard  andWithDice: aDieHandle.
+	
+	aGame playARound.
+	
+	self assert: (aGame ended) equals: false.
 
-{ #category : #tests }
-OcaGameTest >> testCreateAGameWithANumberOfCellsSuccessfully [
-	| aGame |
-	aGame := Game withCells: 10.
-	self assert: aGame cells equals: 10
-]
-
-{ #category : #tests }
-OcaGameTest >> testCreateAPlayerWithNameSuccessfully [
-	| aPlayer |
-	aPlayer := Player withName: 'Jorge'.
-	self assert: aPlayer name equals: 'Jorge'
 ]
 
 { #category : #tests }

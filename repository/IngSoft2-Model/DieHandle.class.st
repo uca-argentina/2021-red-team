@@ -24,11 +24,6 @@ DieHandle >> initializeWithDie: aDie [
 ]
 
 { #category : #'as yet unclassified' }
-DieHandle >> numberOfDice [
-	^ dice size.
-]
-
-{ #category : #'as yet unclassified' }
 DieHandle >> roll [
 	^ dice sum: [ :aDie | aDie roll ].
 ]
