@@ -14,7 +14,7 @@ OcaGameTest >> testCreateADieWithANumberOfFacesSuccessfully [
 { #category : #tests }
 OcaGameTest >> testCreateAGameAndPlayARound [
 	
-	| aDieHandle die1 die2 players aBoard aGame |
+	| aDieHandle players aBoard aGame |
 	
 	players := OrderedCollection new.
 	players add: 'Cande';
