@@ -12,19 +12,19 @@ Die class >> withFaces: aNumberOfFaces [
 	^ self new initializeWithFaces: aNumberOfFaces.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #queries }
 Die >> faces [
 	^ faces.
 ]
 
 { #category : #initialize }
 Die >> initializeWithFaces: aNumberOfFaces [
-
+	(aNumberOfFaces > 0 ) ifFalse: [ self error: 'invalid number of faces' ].
 	faces := aNumberOfFaces.
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
 Die >> roll [
-	^ (faces//2)+1.
+	self subclassResponsibility.
 ]

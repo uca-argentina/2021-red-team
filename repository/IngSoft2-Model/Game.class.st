@@ -13,7 +13,7 @@ Game class >> withBoard: aBoard andWithDice: aDieHandle [
 	^ self new initializeWithBoard: aBoard andWithDice: aDieHandle.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #queries }
 Game >> ended [
 	^ board anyChipFinished.
 ]
@@ -24,23 +24,29 @@ Game >> initializeWithBoard: aBoard andWithDice: aDieHandle [
 	board := aBoard.
 ]
 
-{ #category : #'as yet unclassified' }
-Game >> playATurn [
-	board moveChip: (self rollDice).
-	
+{ #category : #actions }
+Game >> play [
+	self playATurn.
+	( self ended ) ifFalse: [self play].
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
+Game >> playATurn [
+	(self ended) ifTrue: [ self error: 'the game has ended' ].
+	board moveChip: (self rollDice).
+]
+
+{ #category : #queries }
 Game >> positionOfPlayer: aPlayer [
 	^ board positionOfPlayer: aPlayer.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
 Game >> rollDice [
 	^ dieHandle roll.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #queries }
 Game >> whosFirst [
 	^ board whosFirst.
 ]

@@ -19,7 +19,7 @@ Chip >> initializeWithName: aName [
 	position := 0.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
 Chip >> move: aNumberOfCells [
 	position := position + aNumberOfCells.
 ]

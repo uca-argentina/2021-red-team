@@ -12,7 +12,7 @@ DieHandle class >> withDie: aDie [
 	^ self new initializeWithDie: aDie.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
 DieHandle >> addDie: aDie [ 
 	dice add: aDie.
 ]
@@ -23,7 +23,7 @@ DieHandle >> initializeWithDie: aDie [
 	dice add: aDie.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
 DieHandle >> roll [
 	^ dice sum: [ :aDie | aDie roll ].
 ]

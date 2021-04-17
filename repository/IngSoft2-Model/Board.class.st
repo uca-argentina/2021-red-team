@@ -3,8 +3,6 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'cells',
-		'playerHandle',
-		'players',
 		'chips'
 	],
 	#category : #'IngSoft2-Model'
@@ -15,18 +13,20 @@ Board class >> withCells: aNumberOfCells andWithChips: chips [
 	^ self new initializeWithCells: aNumberOfCells andWithChips: chips.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #queries }
 Board >> anyChipFinished [
 	^ chips anySatisfy: [ :aChip | aChip position >= cells ].
 ]
 
 { #category : #initialize }
 Board >> initializeWithCells: aNumberOfCells andWithChips: chipsFromPlayers [
+	(aNumberOfCells > 0 ) ifFalse: [ self error: 'invalid number of cells' ].
+	(chipsFromPlayers size > 0) ifFalse: [ self error: 'invalid number of players' ].
 	cells := aNumberOfCells.
 	chips := chipsFromPlayers.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #actions }
 Board >> moveChip: aNumberOfCells [
 	| currentChip |
 	currentChip := chips removeFirst.
@@ -35,14 +35,14 @@ Board >> moveChip: aNumberOfCells [
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #queries }
 Board >> positionOfPlayer: aName [
 	| chip |
 	chip := chips detect: [ :aChip | aChip nameOfPlayer == aName ].
 	^ chip position.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #queries }
 Board >> whosFirst [
 	| positions indexOfFirstChip |
 	positions := chips collect: [ :aChip | aChip position ].
