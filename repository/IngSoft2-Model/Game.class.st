@@ -15,7 +15,7 @@ Game class >> withBoard: aBoard andWithDice: aDieHandle [
 
 { #category : #'as yet unclassified' }
 Game >> ended [
-	^false.
+	^ board anyChipFinished.
 ]
 
 { #category : #initialize }
@@ -25,11 +25,22 @@ Game >> initializeWithBoard: aBoard andWithDice: aDieHandle [
 ]
 
 { #category : #'as yet unclassified' }
-Game >> playARound [
-	board nextTurn: (self rollDice).
+Game >> playATurn [
+	board moveChip: (self rollDice).
+	
+]
+
+{ #category : #'as yet unclassified' }
+Game >> positionOfPlayer: aPlayer [
+	^ board positionOfPlayer: aPlayer.
 ]
 
 { #category : #'as yet unclassified' }
 Game >> rollDice [
 	^ dieHandle roll.
+]
+
+{ #category : #'as yet unclassified' }
+Game >> whosFirst [
+	^ board whosFirst.
 ]

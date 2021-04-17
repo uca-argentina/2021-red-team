@@ -5,35 +5,60 @@ Class {
 }
 
 { #category : #tests }
-OcaGameTest >> testCreateADieWithANumberOfFacesSuccessfully [
-	| aDice |
-	aDice := Die withFaces: 8.
-	self assert: aDice faces equals: 8.
-]
-
-{ #category : #tests }
-OcaGameTest >> testCreateAGameAndPlayARound [
+OcaGameTest >> testCheckTheGameHasntEndedSuccessfully [
 	
-	| aDieHandle players aBoard aGame |
+	| aDieHandle aBoard aGame chips |
 	
-	players := OrderedCollection new.
-	players add: 'Cande';
-				add: 'Mateo';
-				 add: 'Barto'.
-		
+	chips := OrderedCollection new.
+	chips add: (Chip ofPlayer: 'cande');
+				add: (Chip ofPlayer: 'barto');
+				add: (Chip ofPlayer: 'mateo').
+				
 	aDieHandle := DieHandle withDie: (Die withFaces: 6).
 	
 	aDieHandle addDie: (Die withFaces: 8);
 				addDie: (Die withFaces: 4).
 	
-	aBoard := Board withCells: 100 andWithPlayers: players.
+	aBoard := Board withCells: 10 andWithChips: chips.
 	
 	aGame := Game withBoard: aBoard  andWithDice: aDieHandle.
 	
-	aGame playARound.
+	aGame playATurn.
 	
-	self assert: (aGame ended) equals: false.
+	self assert: (aGame ended) equals: true.
+	self assert: (aGame whosFirst) equals: 'cande'.
+]
 
+{ #category : #tests }
+OcaGameTest >> testCreateABoardWithChipsAndPlayATurnSuccessfully [
+	
+	| aDieHandle aBoard aGame chips |
+	
+	chips := OrderedCollection new.
+	chips add: (Chip ofPlayer: 'cande');
+				add: (Chip ofPlayer: 'barto');
+				add: (Chip ofPlayer: 'mateo').
+				
+	aDieHandle := DieHandle withDie: (Die withFaces: 6).
+	
+	aDieHandle addDie: (Die withFaces: 8);
+				addDie: (Die withFaces: 4).
+	
+	aBoard := Board withCells: 100 andWithChips: chips.
+	
+	aGame := Game withBoard: aBoard  andWithDice: aDieHandle.
+	
+	aGame playATurn.
+	
+	self assert: (aGame positionOfPlayer: 'cande') equals: 12.
+
+]
+
+{ #category : #tests }
+OcaGameTest >> testCreateADieWithANumberOfFacesSuccessfully [
+	| aDice |
+	aDice := Die withFaces: 8.
+	self assert: aDice faces equals: 8.
 ]
 
 { #category : #tests }
