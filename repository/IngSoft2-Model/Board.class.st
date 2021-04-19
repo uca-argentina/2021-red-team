@@ -10,6 +10,8 @@ Class {
 
 { #category : #'instance creation' }
 Board class >> withCells: aNumberOfCells andWithChips: chips [
+	(aNumberOfCells > 0 ) ifFalse: [ self error: 'invalid number of cells' ].
+	(chips size > 0) ifFalse: [ self error: 'invalid number of players' ].
 	^ self new initializeWithCells: aNumberOfCells andWithChips: chips.
 ]
 
@@ -20,8 +22,6 @@ Board >> anyChipFinished [
 
 { #category : #initialize }
 Board >> initializeWithCells: aNumberOfCells andWithChips: chipsFromPlayers [
-	(aNumberOfCells > 0 ) ifFalse: [ self error: 'invalid number of cells' ].
-	(chipsFromPlayers size > 0) ifFalse: [ self error: 'invalid number of players' ].
 	cells := aNumberOfCells.
 	chips := chipsFromPlayers.
 ]

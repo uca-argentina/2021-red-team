@@ -8,7 +8,8 @@ Class {
 }
 
 { #category : #'instance creation' }
-Die class >> withFaces: aNumberOfFaces [ 
+Die class >> withFaces: aNumberOfFaces [
+	(aNumberOfFaces > 0 ) ifFalse: [ self error: 'invalid number of faces' ].
 	^ self new initializeWithFaces: aNumberOfFaces.
 ]
 
@@ -19,7 +20,6 @@ Die >> faces [
 
 { #category : #initialize }
 Die >> initializeWithFaces: aNumberOfFaces [
-	(aNumberOfFaces > 0 ) ifFalse: [ self error: 'invalid number of faces' ].
 	faces := aNumberOfFaces.
 	
 ]
