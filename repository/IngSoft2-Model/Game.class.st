@@ -18,16 +18,16 @@ Game >> ended [
 	^ board anyChipFinished.
 ]
 
-{ #category : #queries }
-Game >> finalPositionOf: aPlayer [ 
-	board orderChipsByFinalPosition.
-	^ board finalPositionOf: aPlayer.
-]
-
 { #category : #initialize }
 Game >> initializeWithBoard: aBoard andWithDice: aDieHandle [ 
 	dieHandle := aDieHandle.
 	board := aBoard.
+]
+
+{ #category : #queries }
+Game >> placeOnThePodiumOf: nameOfPlayer [ 
+	board orderChipsByFinalPosition.
+	^ board placeOnThePodiumOf: nameOfPlayer.
 ]
 
 { #category : #actions }
@@ -43,8 +43,8 @@ Game >> playATurn [
 ]
 
 { #category : #queries }
-Game >> positionOfPlayer: aPlayer [
-	^ board positionOfPlayer: aPlayer.
+Game >> positionOfPlayer: nameOfPlayer [
+	^ board positionOfPlayer: nameOfPlayer.
 ]
 
 { #category : #actions }

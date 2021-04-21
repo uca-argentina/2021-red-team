@@ -21,10 +21,8 @@ Board >> anyChipFinished [
 ]
 
 { #category : #queries }
-Board >> finalPositionOf: aPlayer [
-	| chipFromPlayer |
-	chipFromPlayer := chips detect: [ :aChip | aChip nameOfPlayer == aPlayer ].
-	^ chips indexOf: chipFromPlayer.
+Board >> findChipByName: nameOfPlayer [
+	^ chips detect: [ :aChip | aChip nameOfPlayer == nameOfPlayer ].
 ]
 
 { #category : #initialize }
@@ -49,9 +47,16 @@ Board >> orderChipsByFinalPosition [
 ]
 
 { #category : #queries }
-Board >> positionOfPlayer: aName [
+Board >> placeOnThePodiumOf: nameOfPlayer [
+	| chipFromPlayer |
+	chipFromPlayer := self findChipByName: nameOfPlayer .
+	^ chips indexOf: chipFromPlayer.
+]
+
+{ #category : #queries }
+Board >> positionOfPlayer: nameOfPlayer [ 
 	| chip |
-	chip := chips detect: [ :aChip | aChip nameOfPlayer == aName ].
+	chip := self findChipByName: nameOfPlayer .
 	^ chip position.
 ]
 
