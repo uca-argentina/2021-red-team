@@ -23,6 +23,25 @@ OcaGameTest >> testAskFinalPositionAfterTheGameEndedSuccessfully [
 ]
 
 { #category : #tests }
+OcaGameTest >> testAskFinalPositionBeforeTheGameEndedSuccessfully [
+	| aDieHandle aBoard aGame chips |
+	chips := OrderedCollection new.
+	chips
+		add: (Chip ofPlayer: 'barto');
+		add: (Chip ofPlayer: 'cande');
+		add: (Chip ofPlayer: 'mateo');
+		add: (Chip ofPlayer: 'roman').
+	aDieHandle := DieHandle withDie: (LoadedDie withFaces: 6).
+	aDieHandle addDie: (LoadedDie withFaces: 8).
+	aBoard := Board withCells: 50 andWithChips: chips.
+	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
+	aGame playATurn;
+			playATurn. 
+	self should: [aGame finalPositionOf: 'barto'] raise: Error.
+
+]
+
+{ #category : #tests }
 OcaGameTest >> testAskWhosFirstDuringAGameSuccessfully [
 	| aDieHandle aBoard aGame chips |
 	chips := OrderedCollection new.

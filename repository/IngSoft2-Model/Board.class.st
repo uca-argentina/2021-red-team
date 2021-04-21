@@ -11,7 +11,7 @@ Class {
 { #category : #'instance creation' }
 Board class >> withCells: aNumberOfCells andWithChips: chips [
 	(aNumberOfCells > 0 ) ifFalse: [ self error: 'invalid number of cells' ].
-	(chips size > 0) ifFalse: [ self error: 'invalid number of players' ].
+	(chips isEmpty ) ifTrue: [ self error: 'invalid number of players' ].
 	^ self new initializeWithCells: aNumberOfCells andWithChips: chips.
 ]
 
@@ -45,7 +45,7 @@ Board >> moveChip: aNumberOfCells [
 { #category : #actions }
 Board >> orderChipsByFinalPosition [
 	( self anyChipFinished ) ifFalse: [ self error: 'the game hasnt ended' ].
-	chips := chips asSortedCollection: [ :chipA :chipB | chipA position > chipB position].
+	chips := chips asSortedCollection: [ :chipA :chipB | chipA position >= chipB position].
 ]
 
 { #category : #queries }

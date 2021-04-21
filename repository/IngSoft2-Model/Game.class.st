@@ -15,12 +15,12 @@ Game class >> withBoard: aBoard andWithDice: aDieHandle [
 
 { #category : #queries }
 Game >> ended [
-	( board anyChipFinished ) ifTrue: [ board orderChipsByFinalPosition ].
 	^ board anyChipFinished.
 ]
 
 { #category : #queries }
 Game >> finalPositionOf: aPlayer [ 
+	board orderChipsByFinalPosition.
 	^ board finalPositionOf: aPlayer.
 ]
 
