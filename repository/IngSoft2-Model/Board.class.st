@@ -20,6 +20,13 @@ Board >> anyChipFinished [
 	^ chips anySatisfy: [ :aChip | aChip position >= cells ].
 ]
 
+{ #category : #queries }
+Board >> finalPositionOf: aPlayer [
+	| chipFromPlayer |
+	chipFromPlayer := chips detect: [ :aChip | aChip nameOfPlayer == aPlayer ].
+	^ chips indexOf: chipFromPlayer.
+]
+
 { #category : #initialize }
 Board >> initializeWithCells: aNumberOfCells andWithChips: chipsFromPlayers [
 	cells := aNumberOfCells.
@@ -33,6 +40,12 @@ Board >> moveChip: aNumberOfCells [
 	currentChip move: aNumberOfCells.
 	chips addLast: currentChip.
 	
+]
+
+{ #category : #actions }
+Board >> orderChipsByFinalPosition [
+	( self anyChipFinished ) ifFalse: [ self error: 'the game hasnt ended' ].
+	chips := chips asSortedCollection: [ :chipA :chipB | chipA position > chipB position].
 ]
 
 { #category : #queries }
