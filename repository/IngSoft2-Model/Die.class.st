@@ -9,7 +9,7 @@ Class {
 
 { #category : #'instance creation' }
 Die class >> withFaces: aNumberOfFaces [
-	(aNumberOfFaces > 0 ) ifFalse: [ self error: 'invalid number of faces' ].
+	(aNumberOfFaces > 3 ) ifFalse: [ self error: 'invalid number of faces' ].
 	^ self new initializeWithFaces: aNumberOfFaces.
 ]
 
