@@ -11,7 +11,7 @@ Class {
 { #category : #'instance creation' }
 Board class >> withCells: aNumberOfCells andWithChips: chips [
 	(aNumberOfCells > 0 ) ifFalse: [ self error: 'invalid number of cells' ].
-	(chips isEmpty ) ifTrue: [ self error: 'invalid number of players' ].
+	chips ifEmpty: [ self error: 'invalid number of players' ].
 	^ self new initializeWithCells: aNumberOfCells andWithChips: chips.
 ]
 

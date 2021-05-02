@@ -8,8 +8,9 @@ Class {
 }
 
 { #category : #'instance creation' }
-DieHandle class >> withDie: aDie [
-	^ self new initializeWithDie: aDie.
+DieHandle class >> with: dice [
+	dice ifEmpty: [ self error: 'cannot create an empty die handle' ].
+	^ self new initializeWith: dice.
 ]
 
 { #category : #actions }
@@ -18,9 +19,8 @@ DieHandle >> addDie: aDie [
 ]
 
 { #category : #initialize }
-DieHandle >> initializeWithDie: aDie [ 
-	dice := OrderedCollection new.
-	dice add: aDie.
+DieHandle >> initializeWith: anArrayOfDie [
+	dice := anArrayOfDie.
 ]
 
 { #category : #actions }
