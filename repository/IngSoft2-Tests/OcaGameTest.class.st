@@ -5,6 +5,15 @@ Class {
 }
 
 { #category : #tests }
+OcaGameTest >> should: block raise: kindOfError withMessage: expectedMessage [
+	self
+		should: block
+		raise: kindOfError
+		withExceptionDo:
+			[ :error | self assert: error messageText equals: expectedMessage ]
+]
+
+{ #category : #tests }
 OcaGameTest >> testABoardCannotBeCreatedWithoutCells [
 	| chips |
 	chips := OrderedCollection new.
@@ -24,14 +33,14 @@ OcaGameTest >> testABoardCannotBeCreatedWithoutChips [
 
 { #category : #tests }
 OcaGameTest >> testADieCannotBeCreatedWithLessThanFourFaces [
-	self should: [ RandomDie withFaces: 3 ] raise: Error
+	self should: [ RandomDie withFaces: 3 ] raise: Error withMessage: 'invalid number of faces'.
 ]
 
 { #category : #tests }
 OcaGameTest >> testADieHandleCannotBeCreatedWithoutDice [
 	| dice |
 	dice := Array new.
-	self should: [DieHandle with: dice] raise: Error.
+	self should: [ DieHandle with: dice ] raise: Error withMessage: 'cannot create an empty die handle'
 ]
 
 { #category : #tests }
@@ -96,7 +105,7 @@ OcaGameTest >> testCheckTheGameHasntEnded [
 	aBoard := Board withCells: 10 andWithChips: chips.
 	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
 	aGame playATurn.
-	self assert: aGame ended equals: true.
+	self assert: aGame ended.
 	self assert: aGame whosFirst equals: 'cande'
 ]
 
@@ -157,7 +166,7 @@ OcaGameTest >> testPlayAGameWithLoadedDice [
 	aBoard := Board withCells: 50 andWithChips: chips.
 	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
 	aGame play.
-	self assert: aGame ended equals: true.
+	self assert: aGame ended.
 	self assert: aGame whosFirst equals: 'cande'
 ]
 
@@ -177,7 +186,7 @@ OcaGameTest >> testPlayAGameWithRandomDice [
 	aBoard := Board withCells: 50 andWithChips: chips.
 	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
 	aGame play.
-	self assert: aGame ended equals: true
+	self assert: aGame ended
 ]
 
 { #category : #tests }
