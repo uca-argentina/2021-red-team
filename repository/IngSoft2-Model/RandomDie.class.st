@@ -13,11 +13,6 @@ RandomDie class >> withFaces: aNumberOfFaces [
 	^ self new initializeWithFaces: aNumberOfFaces.
 ]
 
-{ #category : #queries }
-RandomDie >> faces [
-	^ faces.
-]
-
 { #category : #initialize }
 RandomDie >> initializeWithFaces: aNumberOfFaces [
 	faces := aNumberOfFaces.

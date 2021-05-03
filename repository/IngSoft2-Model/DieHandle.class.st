@@ -13,11 +13,6 @@ DieHandle class >> with: dice [
 	^ self new initializeWith: dice.
 ]
 
-{ #category : #actions }
-DieHandle >> addDie: aDie [ 
-	dice add: aDie.
-]
-
 { #category : #initialize }
 DieHandle >> initializeWith: anArrayOfDie [
 	dice := anArrayOfDie.

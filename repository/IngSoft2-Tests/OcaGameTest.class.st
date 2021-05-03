@@ -110,6 +110,16 @@ OcaGameTest >> testCheckTheGameHasntEnded [
 ]
 
 { #category : #tests }
+OcaGameTest >> testCreateACircularBoardWithCells [
+	| aCircularBoard |
+
+	aCircularBoard := CircularBoard withCells: 100.
+	
+	self assert: aCircularBoard numberOfCells equals: 100. 
+	
+]
+
+{ #category : #tests }
 OcaGameTest >> testFinalPositionCannotBeAskedBeforeGameEnded [
 	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
 	chips := OrderedCollection new.
