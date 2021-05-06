@@ -110,12 +110,12 @@ OcaGameTest >> testCheckTheGameHasntEnded [
 ]
 
 { #category : #tests }
-OcaGameTest >> testCreateACircularBoardWithCells [
+OcaGameTest >> testCreateACircularBoardOnlyWithRegularCells [
 	| aCircularBoard |
-
-	aCircularBoard := CircularBoard withCells: 100.
 	
-	self assert: aCircularBoard numberOfCells equals: 100. 
+	aCircularBoard := CircularBoard withCells: 100 andPercentageOfRegular: 100.
+	
+	self assert: aCircularBoard numberOfCells equals: 100.
 	
 ]
 

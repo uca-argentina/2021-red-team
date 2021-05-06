@@ -12,8 +12,13 @@ CircularBoard class >> withCells: aNumberOfCells [
 	^self new initializeWithCells: aNumberOfCells .
 ]
 
+{ #category : #'instance creation' }
+CircularBoard class >> withCells: aNumberOfCells andPercentageOfRegular: aProportionOfRegularCells [
+	^ self new initializeWithCells: aNumberOfCells andWithPercentageOfRegular: aProportionOfRegularCells.
+]
+
 { #category : #initialize }
-CircularBoard >> initializeWithCells: aNumberOfCells [ 
+CircularBoard >> initializeWithCells: aNumberOfCells [
 	| numberOfRegularCells numberOfWormHoleCells numberOfSpeedUpCells numberOfMoonWalkCells numberOfAtomicBombCells auxiliarCells |
 	numberOfRegularCells := 0.48 * aNumberOfCells .
 	numberOfWormHoleCells := 0.20 * aNumberOfCells .
@@ -28,6 +33,15 @@ CircularBoard >> initializeWithCells: aNumberOfCells [
 	1 to: numberOfAtomicBombCells do: [ :i | auxiliarCells add: (AtomicBombCell new)].
 	cells:= auxiliarCells.
 	
+]
+
+{ #category : #initialize }
+CircularBoard >> initializeWithCells: aNumberOfCells andWithPercentageOfRegular: aProportionOfRegularCells [
+	| numberOfRegularCells auxiliarCells |
+	numberOfRegularCells := aNumberOfCells * (aProportionOfRegularCells // 100).
+	auxiliarCells := OrderedCollection new.
+	1 to: numberOfRegularCells do: [ :i | auxiliarCells add: (RegularCell new)].
+	cells := auxiliarCells.
 ]
 
 { #category : #query }
