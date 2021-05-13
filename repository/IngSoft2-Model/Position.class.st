@@ -18,3 +18,18 @@ Position >> initializeWith: name [
 	player := name.
 	value := 0.
 ]
+
+{ #category : #queries }
+Position >> nameOfPlayer [
+	^ player.
+]
+
+{ #category : #actions }
+Position >> updatePosition: rollValue [
+	value := value + rollValue.
+]
+
+{ #category : #queries }
+Position >> valueOfPosition [
+	^ value.
+]

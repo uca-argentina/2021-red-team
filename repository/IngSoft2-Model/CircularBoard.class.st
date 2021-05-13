@@ -2,49 +2,64 @@ Class {
 	#name : #CircularBoard,
 	#superclass : #Object,
 	#instVars : [
-		'cells'
+		'cells',
+		'boardOfPositions'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'instance creation' }
-CircularBoard class >> withCells: aNumberOfCells [  
-	^self new initializeWithCells: aNumberOfCells .
+CircularBoard class >> with: players andWithAll: cells [
+	| boardOfPositions |
+	cells ifEmpty: [ self error: 'cant create a board without cells' ].
+	players ifEmpty: [ self error: 'invalid number of players' ].
+	boardOfPositions := BoardOfPositions with: players.
+	^ self new initializeWith: boardOfPositions andWithAll: cells.
 ]
 
-{ #category : #'instance creation' }
-CircularBoard class >> withCells: aNumberOfCells andPercentageOfRegular: aProportionOfRegularCells [
-	^ self new initializeWithCells: aNumberOfCells andWithPercentageOfRegular: aProportionOfRegularCells.
+{ #category : #queries }
+CircularBoard >> anyPlayerFinished: laps [
+	^ false.
 ]
 
 { #category : #initialize }
-CircularBoard >> initializeWithCells: aNumberOfCells [
-	| numberOfRegularCells numberOfWormHoleCells numberOfSpeedUpCells numberOfMoonWalkCells numberOfAtomicBombCells auxiliarCells |
-	numberOfRegularCells := 0.48 * aNumberOfCells .
-	numberOfWormHoleCells := 0.20 * aNumberOfCells .
-	numberOfSpeedUpCells := 0.20 * aNumberOfCells .
-	numberOfMoonWalkCells := 0.10 * aNumberOfCells .
-	numberOfAtomicBombCells := 0.02 * aNumberOfCells .
-	auxiliarCells := OrderedCollection new.
-	1 to: numberOfRegularCells do: [ :i | auxiliarCells add: (RegularCell new)].
-	1 to: numberOfWormHoleCells do: [ :i | auxiliarCells add: (WormHoleCell new)].
-	1 to: numberOfSpeedUpCells do: [ :i | auxiliarCells add: (SpeedUpCell new)].
-	1 to: numberOfMoonWalkCells do: [ :i | auxiliarCells add: (MoonWalkCell new)].
-	1 to: numberOfAtomicBombCells do: [ :i | auxiliarCells add: (AtomicBombCell new)].
-	cells:= auxiliarCells.
+CircularBoard >> initializeWith: positions andWithAll: collectionOfCells [
+	cells := collectionOfCells.
+	boardOfPositions := positions.
 	
 ]
 
-{ #category : #initialize }
-CircularBoard >> initializeWithCells: aNumberOfCells andWithPercentageOfRegular: aProportionOfRegularCells [
-	| numberOfRegularCells auxiliarCells |
-	numberOfRegularCells := aNumberOfCells * (aProportionOfRegularCells // 100).
-	auxiliarCells := OrderedCollection new.
-	1 to: numberOfRegularCells do: [ :i | auxiliarCells add: (RegularCell new)].
-	cells := auxiliarCells.
+{ #category : #queries }
+CircularBoard >> lapOfPlayer: playerName [
+	^ boardOfPositions lapOfPlayer: playerName withLapSize: (cells size).
 ]
 
-{ #category : #query }
-CircularBoard >> numberOfCells [
-	^cells size.
+{ #category : #actions }
+CircularBoard >> move: player with: rollValue [
+	| currentPosition currentCell |
+	currentPosition := boardOfPositions updatePositionOf: player with: rollValue.
+	currentPosition := currentPosition \\ (cells size).
+	currentCell := cells at: currentPosition.
+	currentCell activateEffect: self and: player.
+]
+
+{ #category : #actions }
+CircularBoard >> moveEveryone: n except: player [
+	boardOfPositions moveEveryone: n except: player. 
+]
+
+{ #category : #actions }
+CircularBoard >> moveEveryoneToTheBeginningOfTheLap [
+	boardOfPositions moveEveryoneToTheBeginningOfTheLapWithSize: cells size.
+]
+
+{ #category : #queries }
+CircularBoard >> positionOfPlayer: player [
+	^ boardOfPositions positionOfPlayer: player.
+]
+
+{ #category : #actions }
+CircularBoard >> updatePositionOf: player with: value [  
+	| newValueOfPosition |
+	newValueOfPosition := boardOfPositions updatePositionOf: player with: value. 
 ]

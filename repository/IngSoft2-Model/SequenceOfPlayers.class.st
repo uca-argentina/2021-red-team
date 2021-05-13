@@ -16,3 +16,11 @@ SequenceOfPlayers class >> with: players [
 SequenceOfPlayers >> initializeWith: players [
 	orderOfPlayers := players asOrderedCollection.
 ]
+
+{ #category : #queries }
+SequenceOfPlayers >> whosNext [
+	| currentPlayer |
+	currentPlayer := orderOfPlayers removeFirst.
+	orderOfPlayers addLast: currentPlayer.
+	^ currentPlayer.
+]

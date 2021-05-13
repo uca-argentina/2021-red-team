@@ -19,14 +19,9 @@ Game class >> with: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps andW
 	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence andWith: aBoardOfPositions.
 ]
 
-{ #category : #'instance creation' }
-Game class >> withBoard: aBoard andWithDice: aDieHandle [ 
-	^ self new initializeWithBoard: aBoard andWithDice: aDieHandle.
-]
-
 { #category : #queries }
 Game >> ended [
-	^ board anyChipFinished.
+	^ board anyPlayerFinished: laps.
 ]
 
 { #category : #initialize }
@@ -38,28 +33,17 @@ Game >> initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps 
 	boardOfPositions := aBoardOfPositions.
 ]
 
-{ #category : #initialize }
-Game >> initializeWithBoard: aBoard andWithDice: aDieHandle [ 
-	dieHandle := aDieHandle.
-	board := aBoard.
-]
-
 { #category : #queries }
-Game >> placeOnThePodiumOf: nameOfPlayer [ 
-	board orderChipsByFinalPosition.
-	^ board placeOnThePodiumOf: nameOfPlayer.
-]
-
-{ #category : #actions }
-Game >> play [
-	self playATurn.
-	( self ended ) ifFalse: [self play].
+Game >> lapOfPlayer: playerName [
+	^ board lapOfPlayer: playerName.
 ]
 
 { #category : #actions }
 Game >> playATurn [
+	| player |
 	(self ended) ifTrue: [ self error: 'the game has ended' ].
-	board moveChip: (self rollDice).
+	player := playerSequence whosNext.
+	board move: player with: (self rollDice).
 ]
 
 { #category : #queries }
@@ -70,9 +54,4 @@ Game >> positionOfPlayer: nameOfPlayer [
 { #category : #actions }
 Game >> rollDice [
 	^ dieHandle roll.
-]
-
-{ #category : #queries }
-Game >> whosFirst [
-	^ board whosFirst.
 ]

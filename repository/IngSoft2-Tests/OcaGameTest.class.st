@@ -15,20 +15,19 @@ OcaGameTest >> should: block raise: kindOfError withMessage: expectedMessage [
 
 { #category : #tests }
 OcaGameTest >> testABoardCannotBeCreatedWithoutCells [
-	| chips |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'mateo').
-	self should: [ Board withCells: 0 andWithChips: chips ] raise: Error
+	| players cells |
+	players := #('martin' 'juan' 'roman').
+	cells := OrderedCollection new.
+	self should: [ CircularBoard with: players andWithAll: cells ] raise: Error withMessage: 'cant create a board without cells'.
 ]
 
 { #category : #tests }
-OcaGameTest >> testABoardCannotBeCreatedWithoutChips [
-	| chips |
-	chips := OrderedCollection new.
-	self should: [ Board withCells: 10 andWithChips: chips ] raise: Error
+OcaGameTest >> testABoardCannotBeCreatedWithoutPlayers [
+	| players tenRegularCells |
+	players := Array new.
+	tenRegularCells := OrderedCollection new.
+	10 timesRepeat: [ tenRegularCells add: RegularCell new ].
+	self should: [ CircularBoard with: players andWithAll: tenRegularCells ] raise: Error withMessage: 'invalid number of players'.
 ]
 
 { #category : #tests }
@@ -44,178 +43,142 @@ OcaGameTest >> testADieHandleCannotBeCreatedWithoutDice [
 ]
 
 { #category : #tests }
-OcaGameTest >> testAskFinalPositionAfterTheGameEnded [
-	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'mateo');
-		add: (Chip ofPlayer: 'roman').
-	die1 := LoadedDie withFaces: 4.
-	die2 := LoadedDie withFaces: 8.
-	die3 := LoadedDie withFaces: 6.
-	dice := Array with: die1 with: die2 with: die3.
-	aDieHandle := DieHandle with: dice.
-	aBoard := Board withCells: 50 andWithChips: chips.
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
-	aGame play.
-	self assert: (aGame placeOnThePodiumOf: 'barto') equals: 1.
+OcaGameTest >> testAskInWhichLapIsThePlayer [
+    | aCircularBoard die dice aDieHandle players aGame tenRegularCells |
 
-]
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
 
-{ #category : #tests }
-OcaGameTest >> testAskWhosFirstDuringAGame [
-	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'mateo');
-		add: (Chip ofPlayer: 'roman').
-	die1 := LoadedDie withFaces: 4.
-	die2 := LoadedDie withFaces: 8.
-	die3 := LoadedDie withFaces: 6.
-	dice := Array with: die1 with: die2 with: die3.
-	aDieHandle := DieHandle with: dice.
-	aBoard := Board withCells: 50 andWithChips: chips.
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
-	aGame
-		playATurn;
-		playATurn;
-		playATurn;
-		playATurn;
-		playATurn.
-	self assert: aGame whosFirst equals: 'barto'
-]
+    players := #('martin' 'juan' 'roman').
 
-{ #category : #tests }
-OcaGameTest >> testCheckTheGameHasntEnded [
-	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'mateo').
-	die1 := LoadedDie withFaces: 4.
-	die2 := LoadedDie withFaces: 8.
-	die3 := LoadedDie withFaces: 6.
-	dice := Array with: die1 with: die2 with: die3.
-	aDieHandle := DieHandle with: dice.
-	aBoard := Board withCells: 10 andWithChips: chips.
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
-	aGame playATurn.
-	self assert: aGame ended.
-	self assert: aGame whosFirst equals: 'cande'
-]
-
-{ #category : #tests }
-OcaGameTest >> testCreateACircularBoardOnlyWithRegularCells [
-	| aCircularBoard |
+	tenRegularCells := OrderedCollection new.
+	10 timesRepeat: [ tenRegularCells add: RegularCell new ].
 	
-	aCircularBoard := CircularBoard withCells: 100 andPercentageOfRegular: 100.
+    aCircularBoard := CircularBoard with: players andWithAll: tenRegularCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 3 andWith: players.
+
+    4 timesRepeat: [aGame playATurn].
+
+    self assert: (aGame lapOfPlayer: 'martin') equals: 2.
+	 self assert: (aGame lapOfPlayer: 'juan') equals: 1.
+	 self assert: (aGame lapOfPlayer: 'roman') equals: 1.
+]
+
+{ #category : #tests }
+OcaGameTest >> testPlayATurnAndLandOnAMoonWalkCell [
+    | aCircularBoard die dice aDieHandle players aGame tenMoonWalkCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	tenMoonWalkCells := OrderedCollection new.
+	10 timesRepeat: [ tenMoonWalkCells add: (MoonWalkCell with: 4) ].
 	
-	self assert: aCircularBoard numberOfCells equals: 100.
+    aCircularBoard := CircularBoard with: players andWithAll: tenMoonWalkCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 1 andWith: players.
+
+    aGame playATurn.
+
+    self assert: (aGame positionOfPlayer: 'martin') equals: 6.
+	 self assert: (aGame positionOfPlayer: 'juan') equals: -4.
+	 self assert: (aGame positionOfPlayer: 'roman') equals: -4.
+]
+
+{ #category : #tests }
+OcaGameTest >> testPlayATurnAndLandOnARegularCell [
+    | aCircularBoard die dice aDieHandle players aGame tenRegularCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	tenRegularCells := OrderedCollection new.
+	10 timesRepeat: [ tenRegularCells add: RegularCell new ].
 	
+    aCircularBoard := CircularBoard with: players andWithAll: tenRegularCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 1 andWith: players.
+
+    aGame playATurn.
+
+    self assert: (aGame positionOfPlayer: 'martin') equals: 6.
 ]
 
 { #category : #tests }
-OcaGameTest >> testFinalPositionCannotBeAskedBeforeGameEnded [
-	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'mateo');
-		add: (Chip ofPlayer: 'roman').
-	die1 := LoadedDie withFaces: 4.
-	die2 := LoadedDie withFaces: 8.
-	die3 := LoadedDie withFaces: 6.
-	dice := Array with: die1 with: die2 with: die3.
-	aDieHandle := DieHandle with: dice.
-	aBoard := Board withCells: 50 andWithChips: chips.
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
-	aGame playATurn;
-			playATurn. 
-	self should: [aGame placeOnThePodiumOf: 'barto'] raise: Error.
+OcaGameTest >> testPlayATurnAndLandOnASpeedUpCell [
+    | aCircularBoard die dice aDieHandle players aGame tenSpeedUpCells |
 
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	tenSpeedUpCells := OrderedCollection new.
+	10 timesRepeat: [ tenSpeedUpCells add: SpeedUpCell new ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: tenSpeedUpCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 1 andWith: players.
+
+    aGame playATurn.
+
+    self assert: (aGame positionOfPlayer: 'martin') equals: 10.
 ]
 
 { #category : #tests }
-OcaGameTest >> testGameCannotBePlayedIfItHasAlreadyEnded [
-	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'mateo').
-	die1 := RandomDie withFaces: 4.
-	die2 := RandomDie withFaces: 8.
-	die3 := RandomDie withFaces: 6.
-	dice := Array with: die1 with: die2 with: die3.
-	aDieHandle := DieHandle with: dice.
-	aBoard := Board withCells: 10 andWithChips: chips.
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
-	aGame play.
-	self should: [ aGame playATurn ] raise: Error
+OcaGameTest >> testPlayATurnAndLandOnAWormHoleCell [
+    | aCircularBoard die dice aDieHandle players aGame tenWormHoleCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	tenWormHoleCells := OrderedCollection new.
+	10 timesRepeat: [ tenWormHoleCells add: WormHoleCell new ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: tenWormHoleCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 1 andWith: players.
+
+    aGame playATurn.
+
+    self assert: (aGame positionOfPlayer: 'martin') equals: 2.
 ]
 
 { #category : #tests }
-OcaGameTest >> testPlayAGameWithLoadedDice [
-	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'mateo').
-	die1 := LoadedDie withFaces: 4.
-	die2 := LoadedDie withFaces: 8.
-	die3 := LoadedDie withFaces: 6.
-	dice := Array with: die1 with: die2 with: die3.
-	aDieHandle := DieHandle with: dice.
-	aBoard := Board withCells: 50 andWithChips: chips.
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
-	aGame play.
-	self assert: aGame ended.
-	self assert: aGame whosFirst equals: 'cande'
-]
+OcaGameTest >> testPlayATurnAndLandOnAnAtomicBombCell [
+    | aCircularBoard die dice aDieHandle players aGame twentyCells |
 
-{ #category : #tests }
-OcaGameTest >> testPlayAGameWithRandomDice [
-	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'mateo').
-	die1 := RandomDie withFaces: 4.
-	die2 := RandomDie withFaces: 8.
-	die3 := RandomDie withFaces: 6.
-	dice := Array with: die1 with: die2 with: die3.
-	aDieHandle := DieHandle with: dice.
-	aBoard := Board withCells: 50 andWithChips: chips.
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
-	aGame play.
-	self assert: aGame ended
-]
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
 
-{ #category : #tests }
-OcaGameTest >> testPlayATurn [
-	| aDieHandle aBoard aGame chips die1 die2 die3 dice |
-	chips := OrderedCollection new.
-	chips
-		add: (Chip ofPlayer: 'cande');
-		add: (Chip ofPlayer: 'barto');
-		add: (Chip ofPlayer: 'mateo').
-	die1 := LoadedDie withFaces: 4.
-	die2 := LoadedDie withFaces: 8.
-	die3 := LoadedDie withFaces: 6.
-	dice := Array with: die1 with: die2 with: die3.
-	aDieHandle := DieHandle with: dice.
-	aBoard := Board withCells: 100 andWithChips: chips.
-	aGame := Game withBoard: aBoard andWithDice: aDieHandle.
-	aGame playATurn.
-	self assert: (aGame positionOfPlayer: 'cande') equals: 18
+    players := #('martin' 'juan' 'roman').
+
+	twentyCells := OrderedCollection new.
+	10 timesRepeat: [ twentyCells add: RegularCell new ].
+	10 timesRepeat: [ twentyCells add: AtomicBombCell new ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: twentyCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 1 andWith: players.
+
+    4 timesRepeat: [aGame playATurn].
+
+    self assert: (aGame positionOfPlayer: 'martin') equals: 0.
+	 self assert: (aGame positionOfPlayer: 'juan') equals: 0.
+	 self assert: (aGame positionOfPlayer: 'roman') equals: 0.
 ]
 
 { #category : #tests }
