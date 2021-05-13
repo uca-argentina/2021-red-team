@@ -12,6 +12,11 @@ BoardOfPositions class >> with: players [
 	^ self new initializeWith: players.
 ]
 
+{ #category : #queries }
+BoardOfPositions >> anyPlayerFinished: laps withBoardOfSize: cells [
+	^ (positions anySatisfy: [ :position | (position valueOfPosition) > (cells*laps) ]).
+]
+
 { #category : #initialize }
 BoardOfPositions >> initializeWith: players [
 	| auxiliarPositions playerName |

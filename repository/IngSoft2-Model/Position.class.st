@@ -27,6 +27,7 @@ Position >> nameOfPlayer [
 { #category : #actions }
 Position >> updatePosition: rollValue [
 	value := value + rollValue.
+	(value < 0) ifTrue: [ value := 1 ].
 ]
 
 { #category : #queries }

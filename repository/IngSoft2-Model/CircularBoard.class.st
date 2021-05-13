@@ -19,7 +19,7 @@ CircularBoard class >> with: players andWithAll: cells [
 
 { #category : #queries }
 CircularBoard >> anyPlayerFinished: laps [
-	^ false.
+	^ boardOfPositions anyPlayerFinished: laps withBoardOfSize: cells size.
 ]
 
 { #category : #initialize }
@@ -39,6 +39,7 @@ CircularBoard >> move: player with: rollValue [
 	| currentPosition currentCell |
 	currentPosition := boardOfPositions updatePositionOf: player with: rollValue.
 	currentPosition := currentPosition \\ (cells size).
+	(currentPosition = 0) ifTrue: [ currentPosition := cells size ].
 	currentCell := cells at: currentPosition.
 	currentCell activateEffect: self and: player.
 ]
@@ -55,7 +56,10 @@ CircularBoard >> moveEveryoneToTheBeginningOfTheLap [
 
 { #category : #queries }
 CircularBoard >> positionOfPlayer: player [
-	^ boardOfPositions positionOfPlayer: player.
+	| position |
+	position := boardOfPositions positionOfPlayer: player.
+	^ (position > (cells size)) ifTrue: [ position \\ (cells size)]
+									  ifFalse: [ position ].
 ]
 
 { #category : #actions }

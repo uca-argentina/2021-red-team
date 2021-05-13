@@ -20,7 +20,7 @@ Game class >> with: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps andW
 ]
 
 { #category : #queries }
-Game >> ended [
+Game >> hasEnded [
 	^ board anyPlayerFinished: laps.
 ]
 
@@ -39,9 +39,15 @@ Game >> lapOfPlayer: playerName [
 ]
 
 { #category : #actions }
+Game >> play [
+	self playATurn.
+	(self hasEnded) ifFalse: [ self play ].
+]
+
+{ #category : #actions }
 Game >> playATurn [
 	| player |
-	(self ended) ifTrue: [ self error: 'the game has ended' ].
+	(self hasEnded) ifTrue: [ self error: 'the game has ended' ].
 	player := playerSequence whosNext.
 	board move: player with: (self rollDice).
 ]

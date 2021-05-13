@@ -67,6 +67,78 @@ OcaGameTest >> testAskInWhichLapIsThePlayer [
 ]
 
 { #category : #tests }
+OcaGameTest >> testCannotPlayAfterTheGameHasEnded [
+    | aCircularBoard die dice aDieHandle players aGame fifteenCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	fifteenCells := OrderedCollection new.
+	10 timesRepeat: [ fifteenCells add: RegularCell new ].
+	2 timesRepeat: [ fifteenCells add: WormHoleCell new ].
+	2 timesRepeat: [ fifteenCells add: SpeedUpCell new ].
+	1 timesRepeat: [ fifteenCells add: (MoonWalkCell with: 5) ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: fifteenCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 2 andWith: players.
+
+    aGame play.
+
+    self should: [aGame playATurn] raise: Error withMessage: 'the game has ended'.
+]
+
+{ #category : #tests }
+OcaGameTest >> testPlayAGameWithDifferentCells [
+    | aCircularBoard die dice aDieHandle players aGame fifteenCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	fifteenCells := OrderedCollection new.
+	10 timesRepeat: [ fifteenCells add: RegularCell new ].
+	2 timesRepeat: [ fifteenCells add: WormHoleCell new ].
+	2 timesRepeat: [ fifteenCells add: SpeedUpCell new ].
+	1 timesRepeat: [ fifteenCells add: (MoonWalkCell with: 5) ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: fifteenCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 2 andWith: players.
+
+    aGame play.
+
+    self assert: (aGame hasEnded).
+]
+
+{ #category : #tests }
+OcaGameTest >> testPlayAGameWithRegularCells [
+    | aCircularBoard die dice aDieHandle players aGame fifteenRegularCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	fifteenRegularCells := OrderedCollection new.
+	15 timesRepeat: [ fifteenRegularCells add: RegularCell new ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: fifteenRegularCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 2 andWith: players.
+
+    aGame play.
+
+    self assert: (aGame hasEnded).
+]
+
+{ #category : #tests }
 OcaGameTest >> testPlayATurnAndLandOnAMoonWalkCell [
     | aCircularBoard die dice aDieHandle players aGame tenMoonWalkCells |
 
@@ -86,8 +158,8 @@ OcaGameTest >> testPlayATurnAndLandOnAMoonWalkCell [
     aGame playATurn.
 
     self assert: (aGame positionOfPlayer: 'martin') equals: 6.
-	 self assert: (aGame positionOfPlayer: 'juan') equals: -4.
-	 self assert: (aGame positionOfPlayer: 'roman') equals: -4.
+	 self assert: (aGame positionOfPlayer: 'juan') equals: 1.
+	 self assert: (aGame positionOfPlayer: 'roman') equals: 1.
 ]
 
 { #category : #tests }
