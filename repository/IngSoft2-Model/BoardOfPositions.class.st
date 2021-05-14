@@ -50,6 +50,16 @@ BoardOfPositions >> moveEveryoneToTheBeginningOfTheLapWithSize: lapSize [
 ]
 
 { #category : #queries }
+BoardOfPositions >> podiumOfPlayer: name [
+	| podium positionOfPlayer indexOfPlayer positionOfPlayerAux |
+	podium := positions asSortedCollection: [ :positionA :positionB | positionA valueOfPosition >= positionB valueOfPosition ].
+	positionOfPlayer := podium detect: [ :position | position nameOfPlayer = name  ].
+	positionOfPlayerAux := podium detect: [ :position | (position valueOfPosition) = (positionOfPlayer valueOfPosition) ] .
+	indexOfPlayer := podium indexOf: positionOfPlayerAux.
+	^indexOfPlayer.
+]
+
+{ #category : #queries }
 BoardOfPositions >> positionOfPlayer: player [ 
 	| position |
 	position := positions detect: [ :p | p nameOfPlayer = player ].

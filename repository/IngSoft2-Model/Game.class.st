@@ -53,6 +53,11 @@ Game >> playATurn [
 ]
 
 { #category : #queries }
+Game >> podiumOfPlayer: name [
+	^ board podiumOfPlayer: name.
+]
+
+{ #category : #queries }
 Game >> positionOfPlayer: nameOfPlayer [
 	^ board positionOfPlayer: nameOfPlayer.
 ]

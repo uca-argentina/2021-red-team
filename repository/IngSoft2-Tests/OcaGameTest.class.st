@@ -67,6 +67,60 @@ OcaGameTest >> testAskInWhichLapIsThePlayer [
 ]
 
 { #category : #tests }
+OcaGameTest >> testAskPodiumOfPlayerAfterTheGameEnded [
+    | aCircularBoard die dice aDieHandle players aGame fifteenCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	fifteenCells := OrderedCollection new.
+	10 timesRepeat: [ fifteenCells add: RegularCell new ].
+	2 timesRepeat: [ fifteenCells add: WormHoleCell new ].
+	2 timesRepeat: [ fifteenCells add: SpeedUpCell new ].
+	1 timesRepeat: [ fifteenCells add: (MoonWalkCell with: 5) ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: fifteenCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 2 andWith: players.
+
+    aGame play.
+
+   self assert: (aGame podiumOfPlayer:'martin') equals: 1.
+	self assert: (aGame podiumOfPlayer:'juan') equals: 2.
+	self assert: (aGame podiumOfPlayer:'roman') equals: 2.
+]
+
+{ #category : #tests }
+OcaGameTest >> testAskPodiumOfPlayerDuringTheGame [
+    | aCircularBoard die dice aDieHandle players aGame fifteenCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	fifteenCells := OrderedCollection new.
+	10 timesRepeat: [ fifteenCells add: RegularCell new ].
+	2 timesRepeat: [ fifteenCells add: WormHoleCell new ].
+	2 timesRepeat: [ fifteenCells add: SpeedUpCell new ].
+	1 timesRepeat: [ fifteenCells add: (MoonWalkCell with: 5) ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: fifteenCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 2 andWith: players.
+
+	5 timesRepeat: [aGame playATurn].
+
+   self assert: (aGame podiumOfPlayer:'martin') equals: 1.
+	self assert: (aGame podiumOfPlayer:'juan') equals: 1.
+	self assert: (aGame podiumOfPlayer:'roman') equals: 3.
+]
+
+{ #category : #tests }
 OcaGameTest >> testCannotPlayAfterTheGameHasEnded [
     | aCircularBoard die dice aDieHandle players aGame fifteenCells |
 

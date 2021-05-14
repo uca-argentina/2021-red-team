@@ -55,6 +55,11 @@ CircularBoard >> moveEveryoneToTheBeginningOfTheLap [
 ]
 
 { #category : #queries }
+CircularBoard >> podiumOfPlayer: name [ 
+	^ boardOfPositions podiumOfPlayer: name .
+]
+
+{ #category : #queries }
 CircularBoard >> positionOfPlayer: player [
 	| position |
 	position := boardOfPositions positionOfPlayer: player.
