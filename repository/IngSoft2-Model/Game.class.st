@@ -66,3 +66,9 @@ Game >> positionOfPlayer: nameOfPlayer [
 Game >> rollDice [
 	^ dieHandle roll.
 ]
+
+{ #category : #queries }
+Game >> whoWon [
+	(self hasEnded) ifFalse: [ self error: 'the game is still running' ].
+	^board whoWon.
+]

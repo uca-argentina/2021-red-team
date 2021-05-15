@@ -17,6 +17,20 @@ BoardOfPositions >> anyPlayerFinished: laps withBoardOfSize: cells [
 	^ (positions anySatisfy: [ :position | (position valueOfPosition) > (cells*laps) ]).
 ]
 
+{ #category : #actions }
+BoardOfPositions >> createNewPositionsWith: newPosition at: indexOfPosition [
+	| newPositions |
+	newPositions := positions copy.
+	newPositions removeAt: indexOfPosition.
+	newPositions add: newPosition beforeIndex: indexOfPosition.
+	^ newPositions
+]
+
+{ #category : #queries }
+BoardOfPositions >> findPlayer: name in: collection [
+	^ collection detect: [ :position | position nameOfPlayer = name ]
+]
+
 { #category : #initialize }
 BoardOfPositions >> initializeWith: players [
 	| auxiliarPositions playerName |
@@ -28,9 +42,9 @@ BoardOfPositions >> initializeWith: players [
 ]
 
 { #category : #queries }
-BoardOfPositions >> lapOfPlayer: playerName withLapSize: lapSize [
+BoardOfPositions >> lapOfPlayer: name withLapSize: lapSize [
 	| positionOfPlayer |
-	positionOfPlayer := (positions detect: [ :position | position nameOfPlayer = playerName]) valueOfPosition.
+	positionOfPlayer := (self findPlayer: name in: positions) valueOfPosition.
 	^ (positionOfPlayer // lapSize) + 1.
 ]
 
@@ -50,19 +64,25 @@ BoardOfPositions >> moveEveryoneToTheBeginningOfTheLapWithSize: lapSize [
 ]
 
 { #category : #queries }
-BoardOfPositions >> podiumOfPlayer: name [
-	| podium positionOfPlayer indexOfPlayer positionOfPlayerAux |
-	podium := positions asSortedCollection: [ :positionA :positionB | positionA valueOfPosition >= positionB valueOfPosition ].
-	positionOfPlayer := podium detect: [ :position | position nameOfPlayer = name  ].
-	positionOfPlayerAux := podium detect: [ :position | (position valueOfPosition) = (positionOfPlayer valueOfPosition) ] .
-	indexOfPlayer := podium indexOf: positionOfPlayerAux.
-	^indexOfPlayer.
+BoardOfPositions >> orderPositions [
+	^ positions
+		asSortedCollection:
+			[ :positionA :positionB | positionA valueOfPosition >= positionB valueOfPosition ]
 ]
 
 { #category : #queries }
-BoardOfPositions >> positionOfPlayer: player [ 
+BoardOfPositions >> podiumOfPlayer: name [
+	| podium positionOfPlayer indexOfPlayer |
+	podium := self orderPositions.
+	positionOfPlayer := self findPlayer: name in: podium.
+	indexOfPlayer := podium indexOf: positionOfPlayer.
+	^ indexOfPlayer
+]
+
+{ #category : #queries }
+BoardOfPositions >> positionOfPlayer: name [  
 	| position |
-	position := positions detect: [ :p | p nameOfPlayer = player ].
+	position := self findPlayer: name in: positions.
 	^ position valueOfPosition.
 ]
 
@@ -73,9 +93,20 @@ BoardOfPositions >> selectAllPositionsExcept: player [
 ]
 
 { #category : #actions }
-BoardOfPositions >> updatePositionOf: player with: value [ 
-	(positions detect: [ :aPosition | aPosition nameOfPlayer = player ]) updatePosition: value.
-	^ (positions detect: [ :aPosition | aPosition nameOfPlayer = player ]) valueOfPosition.
-	
-	
+BoardOfPositions >> updatePositionOf: name with: value [
+	| newPosition oldPosition indexOfPosition newPositions |
+	oldPosition := self findPlayer: name in: positions.
+	newPosition := oldPosition updatePosition: value.
+	indexOfPosition := positions indexOf: oldPosition.
+	newPositions := self
+		createNewPositionsWith: newPosition
+		at: indexOfPosition.
+	positions := newPositions
+]
+
+{ #category : #queries }
+BoardOfPositions >> whosFirst [
+	| podium |
+	podium := self orderPositions.
+	^(podium first) nameOfPlayer .
 ]

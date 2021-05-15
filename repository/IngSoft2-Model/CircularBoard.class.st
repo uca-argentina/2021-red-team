@@ -37,7 +37,8 @@ CircularBoard >> lapOfPlayer: playerName [
 { #category : #actions }
 CircularBoard >> move: player with: rollValue [
 	| currentPosition currentCell |
-	currentPosition := boardOfPositions updatePositionOf: player with: rollValue.
+	boardOfPositions updatePositionOf: player with: rollValue.
+	currentPosition := boardOfPositions positionOfPlayer: player.
 	currentPosition := currentPosition \\ (cells size).
 	(currentPosition = 0) ifTrue: [ currentPosition := cells size ].
 	currentCell := cells at: currentPosition.
@@ -69,6 +70,10 @@ CircularBoard >> positionOfPlayer: player [
 
 { #category : #actions }
 CircularBoard >> updatePositionOf: player with: value [  
-	| newValueOfPosition |
-	newValueOfPosition := boardOfPositions updatePositionOf: player with: value. 
+	boardOfPositions updatePositionOf: player with: value. 
+]
+
+{ #category : #queries }
+CircularBoard >> whoWon [
+	^boardOfPositions whosFirst.
 ]

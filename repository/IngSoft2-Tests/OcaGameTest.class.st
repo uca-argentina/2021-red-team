@@ -90,7 +90,7 @@ OcaGameTest >> testAskPodiumOfPlayerAfterTheGameEnded [
 
    self assert: (aGame podiumOfPlayer:'martin') equals: 1.
 	self assert: (aGame podiumOfPlayer:'juan') equals: 2.
-	self assert: (aGame podiumOfPlayer:'roman') equals: 2.
+	self assert: (aGame podiumOfPlayer:'roman') equals: 3.
 ]
 
 { #category : #tests }
@@ -116,8 +116,30 @@ OcaGameTest >> testAskPodiumOfPlayerDuringTheGame [
 	5 timesRepeat: [aGame playATurn].
 
    self assert: (aGame podiumOfPlayer:'martin') equals: 1.
-	self assert: (aGame podiumOfPlayer:'juan') equals: 1.
+	self assert: (aGame podiumOfPlayer:'juan') equals: 2.
 	self assert: (aGame podiumOfPlayer:'roman') equals: 3.
+]
+
+{ #category : #tests }
+OcaGameTest >> testCannotAskWhoWonBeforeTheGameEnded [
+    | aCircularBoard die dice aDieHandle players aGame fifteenRegularCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	fifteenRegularCells := OrderedCollection new.
+	15 timesRepeat: [ fifteenRegularCells add: RegularCell new ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: fifteenRegularCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 2 andWith: players.
+
+    4 timesRepeat: [aGame playATurn].
+
+    self should: [aGame whoWon] raise: Error withMessage: 'the game is still running'.
 ]
 
 { #category : #tests }
@@ -143,6 +165,28 @@ OcaGameTest >> testCannotPlayAfterTheGameHasEnded [
     aGame play.
 
     self should: [aGame playATurn] raise: Error withMessage: 'the game has ended'.
+]
+
+{ #category : #tests }
+OcaGameTest >> testPlayAGameAndAskWhoWon [
+    | aCircularBoard die dice aDieHandle players aGame fifteenRegularCells |
+
+    die := LoadedDie withFaces: 6.
+    dice := Array with: die.
+    aDieHandle := DieHandle with: dice.
+
+    players := #('martin' 'juan' 'roman').
+
+	fifteenRegularCells := OrderedCollection new.
+	15 timesRepeat: [ fifteenRegularCells add: RegularCell new ].
+	
+    aCircularBoard := CircularBoard with: players andWithAll: fifteenRegularCells.
+
+    aGame := Game with: aCircularBoard with: aDieHandle withLaps: 2 andWith: players.
+
+    aGame play.
+
+    self assert: aGame whoWon equals: 'martin'.
 ]
 
 { #category : #tests }
