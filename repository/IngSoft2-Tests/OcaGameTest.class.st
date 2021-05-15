@@ -190,6 +190,32 @@ OcaGameTest >> testPlayAGameAndAskWhoWon [
 ]
 
 { #category : #tests }
+OcaGameTest >> testPlayAGameWithARandomOrderOfCells [
+	| aCircularBoard die dice aDieHandle players aGame fifteenCells randomGenerator randomCells |
+	die := LoadedDie withFaces: 6.
+	dice := Array with: die.
+	aDieHandle := DieHandle with: dice.
+	players := #('martin' 'juan' 'roman').
+	fifteenCells := OrderedCollection new.
+	30 timesRepeat: [ fifteenCells add: RegularCell new ].
+	10 timesRepeat: [ fifteenCells add: WormHoleCell new ].
+	10 timesRepeat: [ fifteenCells add: SpeedUpCell new ].
+	3 timesRepeat: [ fifteenCells add: (MoonWalkCell with: 5) ].
+	2 timesRepeat: [ fifteenCells add: (MoonWalkCell with: 3) ].
+	1 timesRepeat: [ fifteenCells add: AtomicBombCell new ].
+	randomGenerator := RandomGenerator new.
+	randomCells := randomGenerator randomize: fifteenCells.
+	aCircularBoard := CircularBoard with: players andWithAll: randomCells.
+	aGame := Game
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 2
+		andWith: players.
+	aGame play.
+	self assert: (aGame hasEnded).
+]
+
+{ #category : #tests }
 OcaGameTest >> testPlayAGameWithDifferentCells [
     | aCircularBoard die dice aDieHandle players aGame fifteenCells |
 
