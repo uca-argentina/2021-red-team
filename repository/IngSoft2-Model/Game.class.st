@@ -40,8 +40,9 @@ Game >> lapOfPlayer: playerName [
 
 { #category : #actions }
 Game >> play [
-	self playATurn.
-	(self hasEnded) ifFalse: [ self play ].
+	"self playATurn.
+	(self hasEnded) ifFalse: [ self play ]."
+	[ self hasEnded ] whileFalse: [ self playATurn ].
 ]
 
 { #category : #actions }

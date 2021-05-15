@@ -192,7 +192,7 @@ OcaGameTest >> testPlayAGameAndAskWhoWon [
 { #category : #tests }
 OcaGameTest >> testPlayAGameWithARandomOrderOfCells [
 	| aCircularBoard die dice aDieHandle players aGame fifteenCells randomGenerator randomCells |
-	die := LoadedDie withFaces: 6.
+	die := LoadedDie withFaces: 10.
 	dice := Array with: die.
 	aDieHandle := DieHandle with: dice.
 	players := #('martin' 'juan' 'roman').
@@ -238,6 +238,34 @@ OcaGameTest >> testPlayAGameWithDifferentCells [
     aGame play.
 
     self assert: (aGame hasEnded).
+]
+
+{ #category : #tests }
+OcaGameTest >> testPlayAGameWithRandomDiceAndRandomOrderOfCells [
+	| aCircularBoard dice aDieHandle players aGame fifteenCells randomGenerator randomCells die1 die2 die3 |
+	die1 := RandomDie withFaces: 10.
+	die2 := RandomDie withFaces: 8.
+	die3 := RandomDie withFaces: 6.
+	dice := Array with: die1 with: die2 with: die3.
+	aDieHandle := DieHandle with: dice.
+	players := #('martin' 'juan' 'roman').
+	fifteenCells := OrderedCollection new.
+	30 timesRepeat: [ fifteenCells add: RegularCell new ].
+	10 timesRepeat: [ fifteenCells add: WormHoleCell new ].
+	10 timesRepeat: [ fifteenCells add: SpeedUpCell new ].
+	3 timesRepeat: [ fifteenCells add: (MoonWalkCell with: 5) ].
+	2 timesRepeat: [ fifteenCells add: (MoonWalkCell with: 3) ].
+	1 timesRepeat: [ fifteenCells add: AtomicBombCell new ].
+	randomGenerator := RandomGenerator new.
+	randomCells := randomGenerator randomize: fifteenCells.
+	aCircularBoard := CircularBoard with: players andWithAll: randomCells.
+	aGame := Game
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 3
+		andWith: players.
+	aGame play.
+	self assert: (aGame hasEnded).
 ]
 
 { #category : #tests }
