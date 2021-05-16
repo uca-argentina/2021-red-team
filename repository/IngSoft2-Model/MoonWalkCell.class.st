@@ -8,8 +8,8 @@ Class {
 }
 
 { #category : #'instance creation' }
-MoonWalkCell class >> with: N [
-	^ self new initializeWith: N.
+MoonWalkCell class >> with: n [
+	^ self new initializeWith: n.
 ]
 
 { #category : #actions }

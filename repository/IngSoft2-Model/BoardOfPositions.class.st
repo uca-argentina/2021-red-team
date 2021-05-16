@@ -9,6 +9,7 @@ Class {
 
 { #category : #'instance creation' }
 BoardOfPositions class >> with: players [
+	players ifEmpty: [ self error: 'cannot create a boardOfPositions without players' ].
 	^ self new initializeWith: players.
 ]
 
@@ -26,25 +27,19 @@ BoardOfPositions >> createNewPositionsWith: newPosition at: indexOfPosition [
 	^ newPositions
 ]
 
-{ #category : #queries }
-BoardOfPositions >> findPlayer: name in: collection [
-	^ collection detect: [ :position | position nameOfPlayer = name ]
-]
-
 { #category : #initialize }
 BoardOfPositions >> initializeWith: players [
-	| auxiliarPositions playerName |
+	| auxiliarPositions |
 	auxiliarPositions := OrderedCollection new.
-	1 to: players size do: [ :i | 
-		playerName := players at: i.
-		auxiliarPositions add: (Position from: playerName) ].
+	players do: [ :player | 
+		auxiliarPositions add: (Position from: player) ].
 	positions := auxiliarPositions
 ]
 
 { #category : #queries }
-BoardOfPositions >> lapOfPlayer: name withLapSize: lapSize [
+BoardOfPositions >> lapOf: name withLapSize: lapSize [
 	| positionOfPlayer |
-	positionOfPlayer := (self findPlayer: name in: positions) valueOfPosition.
+	positionOfPlayer := (self player: name in: positions) valueOfPosition.
 	^ (positionOfPlayer // lapSize) + 1.
 ]
 
@@ -71,18 +66,23 @@ BoardOfPositions >> orderPositions [
 ]
 
 { #category : #queries }
-BoardOfPositions >> podiumOfPlayer: name [
+BoardOfPositions >> player: name in: collection [
+	^ collection detect: [ :position | position nameOfPlayer = name ]
+]
+
+{ #category : #queries }
+BoardOfPositions >> podiumOf: name [
 	| podium positionOfPlayer indexOfPlayer |
 	podium := self orderPositions.
-	positionOfPlayer := self findPlayer: name in: podium.
+	positionOfPlayer := self player: name in: podium.
 	indexOfPlayer := podium indexOf: positionOfPlayer.
 	^ indexOfPlayer
 ]
 
 { #category : #queries }
-BoardOfPositions >> positionOfPlayer: name [  
+BoardOfPositions >> positionOf: name [  
 	| position |
-	position := self findPlayer: name in: positions.
+	position := self player: name in: positions.
 	^ position valueOfPosition.
 ]
 
@@ -95,7 +95,7 @@ BoardOfPositions >> selectAllPositionsExcept: player [
 { #category : #actions }
 BoardOfPositions >> updatePositionOf: name with: value [
 	| newPosition oldPosition indexOfPosition newPositions |
-	oldPosition := self findPlayer: name in: positions.
+	oldPosition := self player: name in: positions.
 	newPosition := oldPosition updatePosition: value.
 	indexOfPosition := positions indexOf: oldPosition.
 	newPositions := self

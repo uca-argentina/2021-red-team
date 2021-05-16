@@ -9,6 +9,7 @@ Class {
 
 { #category : #'instance creation' }
 SequenceOfPlayers class >> with: players [
+	players ifEmpty: [ self error: 'cannot create a sequenceOfPlayers without players' ].
 	^ self new initializeWith: players.
 ]
 

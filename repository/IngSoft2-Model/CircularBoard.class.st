@@ -12,7 +12,7 @@ Class {
 CircularBoard class >> with: players andWithAll: cells [
 	| boardOfPositions |
 	cells ifEmpty: [ self error: 'cant create a board without cells' ].
-	players ifEmpty: [ self error: 'invalid number of players' ].
+	players ifEmpty: [ self error: 'cant create a board without players' ].
 	boardOfPositions := BoardOfPositions with: players.
 	^ self new initializeWith: boardOfPositions andWithAll: cells.
 ]
@@ -30,15 +30,15 @@ CircularBoard >> initializeWith: positions andWithAll: collectionOfCells [
 ]
 
 { #category : #queries }
-CircularBoard >> lapOfPlayer: playerName [
-	^ boardOfPositions lapOfPlayer: playerName withLapSize: (cells size).
+CircularBoard >> lapOf: playerName [
+	^ boardOfPositions lapOf: playerName withLapSize: (cells size).
 ]
 
 { #category : #actions }
 CircularBoard >> move: player with: rollValue [
 	| currentPosition currentCell |
 	boardOfPositions updatePositionOf: player with: rollValue.
-	currentPosition := boardOfPositions positionOfPlayer: player.
+	currentPosition := boardOfPositions positionOf: player.
 	currentPosition := currentPosition \\ (cells size).
 	(currentPosition = 0) ifTrue: [ currentPosition := cells size ].
 	currentCell := cells at: currentPosition.
@@ -56,14 +56,14 @@ CircularBoard >> moveEveryoneToTheBeginningOfTheLap [
 ]
 
 { #category : #queries }
-CircularBoard >> podiumOfPlayer: name [ 
-	^ boardOfPositions podiumOfPlayer: name .
+CircularBoard >> podiumOf: name [ 
+	^ boardOfPositions podiumOf: name .
 ]
 
 { #category : #queries }
-CircularBoard >> positionOfPlayer: player [
+CircularBoard >> positionOf: player [
 	| position |
-	position := boardOfPositions positionOfPlayer: player.
+	position := boardOfPositions positionOf: player.
 	^ (position > (cells size)) ifTrue: [ position \\ (cells size)]
 									  ifFalse: [ position ].
 ]

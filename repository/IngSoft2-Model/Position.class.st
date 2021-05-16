@@ -10,6 +10,7 @@ Class {
 
 { #category : #'instance creation' }
 Position class >> from: playerName [
+	playerName ifEmpty:  [ self error: 'cant create a Position without a name' ].
 	^ self new initializeWith: playerName.
 ]
 
@@ -38,8 +39,7 @@ Position >> nameOfPlayer [
 { #category : #actions }
 Position >> updatePosition: rollValue [
 	| newValue newPosition |
-	newValue := value + rollValue.
-	(newValue < 0) ifTrue: [ newValue := 1 ].
+	newValue := (value + rollValue) max: 1.
 	newPosition := self class from: player with: newValue.
 	^newPosition.
 	

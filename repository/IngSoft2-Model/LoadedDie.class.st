@@ -8,13 +8,13 @@ Class {
 }
 
 { #category : #'instance creation' }
-LoadedDie class >> withFaces: aNumberOfFaces [
+LoadedDie class >> with: aNumberOfFaces [
 	(aNumberOfFaces > 3 ) ifFalse: [ self error: 'invalid number of faces' ].
-	^ self new initializeWithFaces: aNumberOfFaces.
+	^ self new initializeWith: aNumberOfFaces.
 ]
 
 { #category : #initialize }
-LoadedDie >> initializeWithFaces: aNumberOfFaces [
+LoadedDie >> initializeWith: aNumberOfFaces [
 	faces := aNumberOfFaces.
 	
 ]

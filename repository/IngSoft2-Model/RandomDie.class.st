@@ -8,13 +8,13 @@ Class {
 }
 
 { #category : #'instance creation' }
-RandomDie class >> withFaces: aNumberOfFaces [
+RandomDie class >> with: aNumberOfFaces [
 	(aNumberOfFaces > 3 ) ifFalse: [ self error: 'invalid number of faces' ].
-	^ self new initializeWithFaces: aNumberOfFaces.
+	^ self new initializeWith: aNumberOfFaces.
 ]
 
 { #category : #initialize }
-RandomDie >> initializeWithFaces: aNumberOfFaces [
+RandomDie >> initializeWith: aNumberOfFaces [
 	faces := aNumberOfFaces.
 	
 ]
