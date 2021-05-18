@@ -27,19 +27,23 @@ BoardOfPositions >> createNewPositionsWith: newPosition at: indexOfPosition [
 	^ newPositions
 ]
 
+{ #category : #queries }
+BoardOfPositions >> findPositionOf: name in: collection [
+	^ collection detect: [ :position | position nameOfPlayer = name ]
+]
+
 { #category : #initialize }
 BoardOfPositions >> initializeWith: players [
 	| auxiliarPositions |
-	auxiliarPositions := OrderedCollection new.
-	players do: [ :player | 
-		auxiliarPositions add: (Position from: player) ].
-	positions := auxiliarPositions
+	auxiliarPositions := players collect: [ :player | (Position from: player)].
+	positions := auxiliarPositions asOrderedCollection .
+	
 ]
 
 { #category : #queries }
 BoardOfPositions >> lapOf: name withLapSize: lapSize [
 	| positionOfPlayer |
-	positionOfPlayer := (self player: name in: positions) valueOfPosition.
+	positionOfPlayer := (self findPositionOf: name in: positions) valueOfPosition.
 	^ (positionOfPlayer // lapSize) + 1.
 ]
 
@@ -52,29 +56,27 @@ BoardOfPositions >> moveEveryone: n except: player [
 
 { #category : #actions }
 BoardOfPositions >> moveEveryoneToTheBeginningOfTheLapWithSize: lapSize [
-	| moveBackwards |
+	| moveBackwards actualPositionOnLap |
 	positions do: [ :position | 
-		moveBackwards := (-1)*((position valueOfPosition) \\ lapSize).
+		actualPositionOnLap := position valueOfPosition \\ lapSize.
+		moveBackwards := -1*actualPositionOnLap.
 		self updatePositionOf: (position nameOfPlayer) with: moveBackwards ].
 ]
 
 { #category : #queries }
 BoardOfPositions >> orderPositions [
-	^ positions
+	| auxiliarPositions |
+	auxiliarPositions := positions copy.
+	^ auxiliarPositions
 		asSortedCollection:
 			[ :positionA :positionB | positionA valueOfPosition >= positionB valueOfPosition ]
-]
-
-{ #category : #queries }
-BoardOfPositions >> player: name in: collection [
-	^ collection detect: [ :position | position nameOfPlayer = name ]
 ]
 
 { #category : #queries }
 BoardOfPositions >> podiumOf: name [
 	| podium positionOfPlayer indexOfPlayer |
 	podium := self orderPositions.
-	positionOfPlayer := self player: name in: podium.
+	positionOfPlayer := self findPositionOf: name in: podium.
 	indexOfPlayer := podium indexOf: positionOfPlayer.
 	^ indexOfPlayer
 ]
@@ -82,7 +84,7 @@ BoardOfPositions >> podiumOf: name [
 { #category : #queries }
 BoardOfPositions >> positionOf: name [  
 	| position |
-	position := self player: name in: positions.
+	position := self findPositionOf: name in: positions.
 	^ position valueOfPosition.
 ]
 
@@ -95,7 +97,7 @@ BoardOfPositions >> selectAllPositionsExcept: player [
 { #category : #actions }
 BoardOfPositions >> updatePositionOf: name with: value [
 	| newPosition oldPosition indexOfPosition newPositions |
-	oldPosition := self player: name in: positions.
+	oldPosition := self findPositionOf: name in: positions.
 	newPosition := oldPosition updatePosition: value.
 	indexOfPosition := positions indexOf: oldPosition.
 	newPositions := self

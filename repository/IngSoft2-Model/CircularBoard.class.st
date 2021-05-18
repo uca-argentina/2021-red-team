@@ -38,11 +38,9 @@ CircularBoard >> lapOf: playerName [
 CircularBoard >> move: player with: rollValue [
 	| currentPosition currentCell |
 	boardOfPositions updatePositionOf: player with: rollValue.
-	currentPosition := boardOfPositions positionOf: player.
-	currentPosition := currentPosition \\ (cells size).
-	(currentPosition = 0) ifTrue: [ currentPosition := cells size ].
+	currentPosition := self positionOnLap: player.
 	currentCell := cells at: currentPosition.
-	currentCell activateEffect: self and: player.
+	currentCell activateEffect: self and: player
 ]
 
 { #category : #actions }
@@ -66,6 +64,16 @@ CircularBoard >> positionOf: player [
 	position := boardOfPositions positionOf: player.
 	^ (position > (cells size)) ifTrue: [ position \\ (cells size)]
 									  ifFalse: [ position ].
+]
+
+{ #category : #actions }
+CircularBoard >> positionOnLap: player [
+	| position positionOnLap |
+	position := boardOfPositions positionOf: player.
+	positionOnLap := position \\ cells size.
+	positionOnLap = 0
+		ifTrue: [ positionOnLap := cells size ].
+	^ positionOnLap
 ]
 
 { #category : #actions }

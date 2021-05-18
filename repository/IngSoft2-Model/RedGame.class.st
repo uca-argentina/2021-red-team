@@ -42,8 +42,6 @@ RedGame >> lapOf: playerName [
 
 { #category : #actions }
 RedGame >> play [
-	"self playATurn.
-	(self hasEnded) ifFalse: [ self play ]."
 	[ self hasEnded ] whileFalse: [ self playATurn ].
 ]
 
