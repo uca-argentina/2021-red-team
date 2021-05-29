@@ -17,7 +17,7 @@ RedGame class >> with: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps a
 	players ifEmpty: [ self error: 'cannot create a RedGame without players' ].
 	(aNumberOfLaps > 0) ifFalse: [ self error: 'invalid number of laps' ].
 	aSequence := SequenceOfPlayers with: players.
-	aBoardOfPositions := BoardOfPositions with: players.
+	aBoardOfPositions := PositionsBoard with: players.
 	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence andWith: aBoardOfPositions.
 ]
 

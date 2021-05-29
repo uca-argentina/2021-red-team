@@ -1,5 +1,5 @@
 Class {
-	#name : #BoardOfPositions,
+	#name : #PositionsBoard,
 	#superclass : #Object,
 	#instVars : [
 		'positions'
@@ -8,18 +8,18 @@ Class {
 }
 
 { #category : #'instance creation' }
-BoardOfPositions class >> with: players [
+PositionsBoard class >> with: players [
 	players ifEmpty: [ self error: 'cannot create a boardOfPositions without players' ].
 	^ self new initializeWith: players.
 ]
 
 { #category : #queries }
-BoardOfPositions >> anyPlayerFinished: laps withBoardOfSize: cells [
+PositionsBoard >> anyPlayerFinished: laps withBoardOfSize: cells [
 	^ (positions anySatisfy: [ :position | (position valueOfPosition) > (cells*laps) ]).
 ]
 
 { #category : #actions }
-BoardOfPositions >> createNewPositionsWith: newPosition at: indexOfPosition [
+PositionsBoard >> createNewPositionsWith: newPosition at: indexOfPosition [
 	| newPositions |
 	newPositions := positions copy.
 	newPositions removeAt: indexOfPosition.
@@ -28,12 +28,12 @@ BoardOfPositions >> createNewPositionsWith: newPosition at: indexOfPosition [
 ]
 
 { #category : #queries }
-BoardOfPositions >> findPositionOf: name in: collection [
+PositionsBoard >> findPositionOf: name in: collection [
 	^ collection detect: [ :position | position nameOfPlayer = name ]
 ]
 
 { #category : #initialize }
-BoardOfPositions >> initializeWith: players [
+PositionsBoard >> initializeWith: players [
 	| auxiliarPositions |
 	auxiliarPositions := players collect: [ :player | (Position from: player)].
 	positions := auxiliarPositions asOrderedCollection .
@@ -41,21 +41,21 @@ BoardOfPositions >> initializeWith: players [
 ]
 
 { #category : #queries }
-BoardOfPositions >> lapOf: name withLapSize: lapSize [
+PositionsBoard >> lapOf: name withLapSize: lapSize [
 	| positionOfPlayer |
 	positionOfPlayer := (self findPositionOf: name in: positions) valueOfPosition.
 	^ (positionOfPlayer // lapSize) + 1.
 ]
 
 { #category : #actions }
-BoardOfPositions >> moveEveryone: n except: player [
+PositionsBoard >> moveEveryone: n except: player [
 	| playersToMove |
 	playersToMove := (self selectAllPositionsExcept: player) collect: [ :position | position nameOfPlayer ].
 	playersToMove do: [ :name | self updatePositionOf: name with: n ]
 ]
 
 { #category : #actions }
-BoardOfPositions >> moveEveryoneToTheBeginningOfTheLapWithSize: lapSize [
+PositionsBoard >> moveEveryoneToTheBeginningOfTheLapWithSize: lapSize [
 	| moveBackwards actualPositionOnLap |
 	positions do: [ :position | 
 		actualPositionOnLap := position valueOfPosition \\ lapSize.
@@ -64,38 +64,34 @@ BoardOfPositions >> moveEveryoneToTheBeginningOfTheLapWithSize: lapSize [
 ]
 
 { #category : #queries }
-BoardOfPositions >> orderPositions [
-	| auxiliarPositions |
-	auxiliarPositions := positions copy.
-	^ auxiliarPositions
-		asSortedCollection:
-			[ :positionA :positionB | positionA valueOfPosition >= positionB valueOfPosition ]
+PositionsBoard >> orderedPositions [
+	^ positions asSortedCollection: [ :positionA :positionB | positionA >= positionB ]
 ]
 
 { #category : #queries }
-BoardOfPositions >> podiumOf: name [
+PositionsBoard >> podiumOf: name [
 	| podium positionOfPlayer indexOfPlayer |
-	podium := self orderPositions.
+	podium := self orderedPositions.
 	positionOfPlayer := self findPositionOf: name in: podium.
 	indexOfPlayer := podium indexOf: positionOfPlayer.
 	^ indexOfPlayer
 ]
 
 { #category : #queries }
-BoardOfPositions >> positionOf: name [  
+PositionsBoard >> positionOf: name [  
 	| position |
 	position := self findPositionOf: name in: positions.
 	^ position valueOfPosition.
 ]
 
 { #category : #actions }
-BoardOfPositions >> selectAllPositionsExcept: player [
+PositionsBoard >> selectAllPositionsExcept: player [
 	^ positions
 		select: [ :position | (position nameOfPlayer ~= player) ]
 ]
 
 { #category : #actions }
-BoardOfPositions >> updatePositionOf: name with: value [
+PositionsBoard >> updatePositionOf: name with: value [
 	| newPosition oldPosition indexOfPosition newPositions |
 	oldPosition := self findPositionOf: name in: positions.
 	newPosition := oldPosition updatePosition: value.
@@ -107,8 +103,8 @@ BoardOfPositions >> updatePositionOf: name with: value [
 ]
 
 { #category : #queries }
-BoardOfPositions >> whosFirst [
+PositionsBoard >> whosFirst [
 	| podium |
-	podium := self orderPositions.
+	podium := self orderedPositions.
 	^(podium first) nameOfPlayer .
 ]

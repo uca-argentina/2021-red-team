@@ -324,23 +324,27 @@ RedGameTest >> testPlayAGameWithRegularCells [
 
 { #category : #tests }
 RedGameTest >> testPlayATurnAndLandOnAMoonWalkCell [
-	| aCircularBoard aDieHandle players aGame tenMoonWalkCells |
+	| aCircularBoard aDieHandle players aGame twelveCells |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
-	tenMoonWalkCells := OrderedCollection new.
-	self add: (MoonWalkCell with: 4) times: 10 to: tenMoonWalkCells.
+	twelveCells := OrderedCollection new.
+	self add: RegularCell new times: 11 to: twelveCells.
+	self add: (MoonWalkCell with: 4) times: 1 to: twelveCells.
 	aCircularBoard := CircularBoard
 		with: players
-		andWithAll: tenMoonWalkCells.
+		andWithAll: twelveCells.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
 		withLaps: 1
 		andWith: players.
-	aGame playATurn.
-	self assert: (aGame positionOf: 'martin') equals: 6.
-	self assert: (aGame positionOf: 'juan') equals: 1.
-	self assert: (aGame positionOf: 'roman') equals: 1
+	aGame playATurn;
+			playATurn;
+			playATurn;
+			playATurn.
+	self assert: (aGame positionOf: 'martin') equals: 12.
+	self assert: (aGame positionOf: 'juan') equals: 2.
+	self assert: (aGame positionOf: 'roman') equals: 2.
 ]
 
 { #category : #tests }
@@ -364,33 +368,35 @@ RedGameTest >> testPlayATurnAndLandOnARegularCell [
 
 { #category : #tests }
 RedGameTest >> testPlayATurnAndLandOnASpeedUpCell [
-	| aCircularBoard aDieHandle players aGame tenSpeedUpCells |
+	| aCircularBoard aDieHandle players aGame sixCells |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
-	tenSpeedUpCells := OrderedCollection new.
-	self add: SpeedUpCell new times: 10 to: tenSpeedUpCells.
+	sixCells := OrderedCollection new.
+	self add: RegularCell new times: 5 to: sixCells.
+	self add: SpeedUpCell new times: 1 to: sixCells.
 	aCircularBoard := CircularBoard
 		with: players
-		andWithAll: tenSpeedUpCells.
+		andWithAll: sixCells.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
-		withLaps: 1
+		withLaps: 2
 		andWith: players.
 	aGame playATurn.
-	self assert: (aGame positionOf: 'martin') equals: 10
+	self assert: (aGame positionOf: 'martin') equals: 4
 ]
 
 { #category : #tests }
 RedGameTest >> testPlayATurnAndLandOnAWormHoleCell [
-	| aCircularBoard aDieHandle players aGame tenWormHoleCells |
+	| aCircularBoard aDieHandle players aGame sixCells |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
-	tenWormHoleCells := OrderedCollection new.
-	self add: WormHoleCell new times: 10 to: tenWormHoleCells.
+	sixCells := OrderedCollection new.
+	self add: RegularCell new times: 5 to: sixCells.
+	self add: WormHoleCell new times: 1 to: sixCells.
 	aCircularBoard := CircularBoard
 		with: players
-		andWithAll: tenWormHoleCells.
+		andWithAll: sixCells.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
@@ -417,7 +423,7 @@ RedGameTest >> testPlayATurnAndLandOnAnAtomicBombCell [
 	4 timesRepeat: [ aGame playATurn ].
 	self assert: (aGame positionOf: 'martin') equals: 1.
 	self assert: (aGame positionOf: 'juan') equals: 1.
-	self assert: (aGame positionOf: 'roman') equals: 1
+	self assert: (aGame positionOf: 'roman') equals: 1.
 ]
 
 { #category : #tests }

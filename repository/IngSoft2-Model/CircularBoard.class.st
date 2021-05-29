@@ -13,7 +13,7 @@ CircularBoard class >> with: players andWithAll: cells [
 	| boardOfPositions |
 	cells ifEmpty: [ self error: 'cant create a board without cells' ].
 	players ifEmpty: [ self error: 'cant create a board without players' ].
-	boardOfPositions := BoardOfPositions with: players.
+	boardOfPositions := PositionsBoard with: players.
 	^ self new initializeWith: boardOfPositions andWithAll: cells.
 ]
 
