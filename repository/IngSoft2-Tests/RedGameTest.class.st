@@ -1,6 +1,9 @@
 Class {
 	#name : #RedGameTest,
 	#superclass : #TestCase,
+	#instVars : [
+		'cardsDistribution'
+	],
 	#category : #'IngSoft2-Tests'
 }
 
@@ -221,6 +224,21 @@ RedGameTest >> testCannotCreateAGameWithoutPlayers [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotCreateAPlayerWithoutTwoCards [
+	| cardSource |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: OverloadCard new;
+		add: SpeedCard new;
+		add: AccelerationCard new;
+		add: CancellationCard new;
+		add: RedoCard new;
+		add: RepeatCard new.
+	cardSource := RandomSource basedOn: cardsDistribution.
+	self should: [Player with: 'martin' andWith: (cardSource produce: 0)] raise: Error withMessage: 'invalid number of cards'.
+]
+
+{ #category : #tests }
 RedGameTest >> testCannotCreateAPositionWithoutName [
 	self
 		should: [ Position from: '' ]
@@ -259,6 +277,24 @@ RedGameTest >> testCannotPlayAfterTheGameHasEnded [
 		should: [ aGame playATurn ]
 		raise: Error
 		withMessage: 'the game has ended'
+]
+
+{ #category : #tests }
+RedGameTest >> testCreatePlayersWithCards [
+	| cardSource player1 |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: OverloadCard new;
+		add: SpeedCard new;
+		add: AccelerationCard new;
+		add: CancellationCard new;
+		add: RedoCard new;
+		add: RepeatCard new.
+	cardSource := RandomSource basedOn: cardsDistribution.
+	player1 := Player
+		with: 'martin'
+		andWith: (cardSource produce: 2).
+	self assert: player1 numberOfCards equals: 2
 ]
 
 { #category : #tests }
@@ -320,6 +356,42 @@ RedGameTest >> testPlayAGameWithRegularCells [
 		andWith: players.
 	aGame play.
 	self assert: aGame hasEnded
+]
+
+{ #category : #tests }
+RedGameTest >> testPlayATurnAndAskWhoPlaysNext [
+	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: OverloadCard new;
+		add: SpeedCard new;
+		add: AccelerationCard new;
+		add: CancellationCard new;
+		add: RedoCard new;
+		add: RepeatCard new.
+	cardSource := RandomSource basedOn: cardsDistribution.
+	player1 := Player
+		with: 'martin'
+		andWith: (cardSource produce: 2).
+	player2 := Player
+		with: 'juan'
+		andWith: (cardSource produce: 2).
+	aDieHandle := self createADieHandleWithALoadedDie.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 1
+		andWith: players.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	self assert: (game positionOf: 'martin') equals: 6.
+	self assert: (game whosTurnIsIt) equals: 'juan'.
 ]
 
 { #category : #tests }
@@ -449,4 +521,159 @@ RedGameTest >> testRollingADieHandleGivesTheSumOfItsDiceFaces [
 	dice := Array with: die1 with: die2 with: die3.
 	aDieHandle := DieHandle with: dice.
 	self assert: aDieHandle roll equals: 18
+]
+
+{ #category : #tests }
+RedGameTest >> testUseACancellationCard [
+	| player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card cards |
+	cards := OrderedCollection new.
+	cards
+		add: OverloadCard new;
+		add: CancellationCard new.
+	player1 := Player with: 'martin' andWith: cards.
+	player2 := Player with: 'juan' andWith: cards.
+	aDieHandle := self createADieHandleWithALoadedDie.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 1
+		andWith: players.
+	player1 := game rollDiceFor: player1.
+	card := player1 set: 'juan' asTargetOf: 'OverloadCard'.
+	player1 := game usePermanent: card from: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	card := player2 setCancellationCardToRemove: OverloadCard withTarget: 'juan'.
+	player1 := game useInstant: card from: player2.
+	game finishTurn.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
+	self assert: player1 numberOfCards equals: 1.
+	self assert: (game positionOf: 'juan') equals: 10
+]
+
+{ #category : #tests }
+RedGameTest >> testUseASpeedCard [
+	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: SpeedCard new.
+	cardSource := RandomSource basedOn: cardsDistribution.
+	player1 := Player
+		with: 'martin'
+		andWith: (cardSource produce: 2).
+	player2 := Player
+		with: 'juan'
+		andWith: (cardSource produce: 2).
+	aDieHandle := self createADieHandleWithALoadedDie.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 1
+		andWith: players.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
+	card := player1 set: 'martin' asTargetOf: 'SpeedCard'.
+	player1 := game usePermanent: card from: player1.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
+	self assert: (player1 numberOfCards) equals: 1.
+	self assert: (game positionOf: 'martin') equals: 13.
+]
+
+{ #category : #tests }
+RedGameTest >> testUseAnAccelerationCard [
+	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: AccelerationCard new.
+	cardSource := RandomSource basedOn: cardsDistribution.
+	player1 := Player
+		with: 'martin'
+		andWith: (cardSource produce: 2).
+	player2 := Player
+		with: 'juan'
+		andWith: (cardSource produce: 2).
+	aDieHandle := self createADieHandleWithALoadedDie.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 1
+		andWith: players.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
+	card := player1 getCard: 'AccelerationCard'.
+	player1 := game usePermanent: card from: player1.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
+	self assert: (player1 numberOfCards) equals: 1.
+	self assert: (game positionOf: 'martin') equals: 13.
+	self assert: (game positionOf: 'juan') equals: 13.
+]
+
+{ #category : #tests }
+RedGameTest >> testUseAnOverloadCard [
+	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: OverloadCard new.
+	cardSource := RandomSource basedOn: cardsDistribution.
+	player1 := Player
+		with: 'martin'
+		andWith: (cardSource produce: 2).
+	player2 := Player
+		with: 'juan'
+		andWith: (cardSource produce: 2).
+	aDieHandle := self createADieHandleWithALoadedDie.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 1
+		andWith: players.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
+	player1 := game rollDiceFor: player1.
+	card := player1 set: 'juan' asTargetOf: 'OverloadCard'.
+	player1 := game usePermanent: card from: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
+	self assert: (player1 numberOfCards) equals: 1.
+	self assert: (game positionOf: 'juan') equals: 10.
 ]

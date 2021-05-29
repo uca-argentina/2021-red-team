@@ -13,15 +13,27 @@ SequenceOfPlayers class >> with: players [
 	^ self new initializeWith: players.
 ]
 
+{ #category : #actions }
+SequenceOfPlayers >> finishTurn [
+	| currentPlayer |
+	currentPlayer := orderOfPlayers removeFirst.
+	orderOfPlayers addLast: currentPlayer.
+]
+
 { #category : #initialize }
 SequenceOfPlayers >> initializeWith: players [
 	orderOfPlayers := players asOrderedCollection.
 ]
 
 { #category : #queries }
-SequenceOfPlayers >> whosNext [
+SequenceOfPlayers >> whosNextBanana [
 	| currentPlayer |
 	currentPlayer := orderOfPlayers removeFirst.
 	orderOfPlayers addLast: currentPlayer.
 	^ currentPlayer.
+]
+
+{ #category : #queries }
+SequenceOfPlayers >> whosTurnIsIt [
+	^ orderOfPlayers first.
 ]

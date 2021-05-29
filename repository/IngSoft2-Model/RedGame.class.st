@@ -6,7 +6,8 @@ Class {
 		'board',
 		'laps',
 		'playerSequence',
-		'boardOfPositions'
+		'boardOfPositions',
+		'permanentCards'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -21,6 +22,16 @@ RedGame class >> with: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps a
 	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence andWith: aBoardOfPositions.
 ]
 
+{ #category : #actions }
+RedGame >> accumulatePermanentEffectsOn: player [
+	^ permanentCards ifEmpty: [ 0 ] ifNotEmpty: [permanentCards sum: [ :card | card activateEffect: player]].
+]
+
+{ #category : #actions }
+RedGame >> finishTurn [
+	^ playerSequence finishTurn.
+]
+
 { #category : #queries }
 RedGame >> hasEnded [
 	^ board anyPlayerFinished: laps.
@@ -33,6 +44,7 @@ RedGame >> initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLa
 	laps := aNumberOfLaps.
 	playerSequence := aSequenceOfPlayers.
 	boardOfPositions := aBoardOfPositions.
+	permanentCards := OrderedCollection new.
 ]
 
 { #category : #queries }
@@ -49,7 +61,7 @@ RedGame >> play [
 RedGame >> playATurn [
 	| player |
 	(self hasEnded) ifTrue: [ self error: 'the game has ended' ].
-	player := playerSequence whosNext.
+	player := playerSequence whosNextBanana.
 	board move: player with: (self rollDice).
 ]
 
@@ -68,8 +80,39 @@ RedGame >> rollDice [
 	^ dieHandle roll.
 ]
 
+{ #category : #actions }
+RedGame >> rollDiceFor: player [ 
+	"(self hasEnded) ifTrue: [ self error: 'the game has ended' ]."
+	| playerName permanentCardsResult |
+	playerName := player name.
+	(playerName = playerSequence whosTurnIsIt) ifFalse: [ self error: 'cant play on anothers turn' ].
+	permanentCardsResult := self accumulatePermanentEffectsOn: playerName.
+	board move: playerName with: (self rollDice + permanentCardsResult).
+	^ player.
+]
+
+{ #category : #actions }
+RedGame >> useInstant: aCancellationCard from: aPlayer [ 
+	self shouldBeImplemented.
+]
+
+{ #category : #actions }
+RedGame >> usePermanent: card from: player [ 
+	( playerSequence whosTurnIsIt = player name ) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
+	( player hasCard: card ) ifFalse: [ self error: 'cant use a card thats not yours' ].
+	permanentCards add: card.
+	player removeCard: card.
+	^ player.
+	
+]
+
 { #category : #queries }
 RedGame >> whoWon [
 	(self hasEnded) ifFalse: [ self error: 'the game is still running' ].
 	^board whoWon.
+]
+
+{ #category : #queries }
+RedGame >> whosTurnIsIt [
+	^ playerSequence whosTurnIsIt.
 ]
