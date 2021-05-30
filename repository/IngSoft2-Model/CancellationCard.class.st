@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #actions }
+CancellationCard >> from: playerName activateEffect: game [ 
+	game removePermanentCard: cardTarget.
+]
+
+{ #category : #actions }
 CancellationCard >> setTargetAs: aPermanentCard [ 
 	cardTarget := aPermanentCard.
 ]

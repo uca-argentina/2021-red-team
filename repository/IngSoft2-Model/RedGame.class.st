@@ -24,7 +24,12 @@ RedGame class >> with: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps a
 
 { #category : #actions }
 RedGame >> accumulatePermanentEffectsOn: player [
-	^ permanentCards ifEmpty: [ 0 ] ifNotEmpty: [permanentCards sum: [ :card | card activateEffect: player]].
+	^ permanentCards ifEmpty: [ 0 ] ifNotEmpty: [permanentCards sum: [ :card | card effectOn: player]].
+]
+
+{ #category : #actions }
+RedGame >> addToPermanentCards: permanentCard [
+	permanentCards add: permanentCard. 
 ]
 
 { #category : #actions }
@@ -52,6 +57,11 @@ RedGame >> lapOf: playerName [
 	^ board lapOf: playerName.
 ]
 
+{ #category : #queries }
+RedGame >> numberOfPermanentCards [
+	^ permanentCards size.
+]
+
 { #category : #actions }
 RedGame >> play [
 	[ self hasEnded ] whileFalse: [ self playATurn ].
@@ -76,6 +86,12 @@ RedGame >> positionOf: nameOfPlayer [
 ]
 
 { #category : #actions }
+RedGame >> removePermanentCard: card [ 
+	permanentCards ifEmpty: [ self error: 'there are no permanent cards' ].
+	permanentCards := permanentCards reject: [ :aCard | aCard equalsCard: card ].
+]
+
+{ #category : #actions }
 RedGame >> rollDice [
 	^ dieHandle roll.
 ]
@@ -92,18 +108,11 @@ RedGame >> rollDiceFor: player [
 ]
 
 { #category : #actions }
-RedGame >> useInstant: aCancellationCard from: aPlayer [ 
-	self shouldBeImplemented.
-]
-
-{ #category : #actions }
-RedGame >> usePermanent: card from: player [ 
-	( playerSequence whosTurnIsIt = player name ) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
+RedGame >> use: card from: player [
 	( player hasCard: card ) ifFalse: [ self error: 'cant use a card thats not yours' ].
-	permanentCards add: card.
+	card from: player name activateEffect: self.
 	player removeCard: card.
 	^ player.
-	
 ]
 
 { #category : #queries }

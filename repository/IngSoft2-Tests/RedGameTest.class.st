@@ -531,7 +531,7 @@ RedGameTest >> testUseACancellationCard [
 		add: OverloadCard new;
 		add: CancellationCard new.
 	player1 := Player with: 'martin' andWith: cards.
-	player2 := Player with: 'juan' andWith: cards.
+	player2 := Player with: 'juan' andWith: cards copy.
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -546,18 +546,18 @@ RedGameTest >> testUseACancellationCard [
 		andWith: players.
 	player1 := game rollDiceFor: player1.
 	card := player1 set: 'juan' asTargetOf: 'OverloadCard'.
-	player1 := game usePermanent: card from: player1.
+	player1 := game use: card from: player1.
 	game finishTurn.
 	player2 := game rollDiceFor: player2.
 	card := player2 setCancellationCardToRemove: OverloadCard withTarget: 'juan'.
-	player1 := game useInstant: card from: player2.
+	player2 := game use: card from: player2.
 	game finishTurn.
 	player1 := game rollDiceFor: player1.
 	game finishTurn.
 	player2 := game rollDiceFor: player2.
 	game finishTurn.
-	self assert: player1 numberOfCards equals: 1.
-	self assert: (game positionOf: 'juan') equals: 10
+	self assert: player2 numberOfCards equals: 1.
+	self assert: game numberOfPermanentCards equals: 0.
 ]
 
 { #category : #tests }
@@ -590,7 +590,7 @@ RedGameTest >> testUseASpeedCard [
 	player2 := game rollDiceFor: player2.
 	game finishTurn.
 	card := player1 set: 'martin' asTargetOf: 'SpeedCard'.
-	player1 := game usePermanent: card from: player1.
+	player1 := game use: card from: player1.
 	player1 := game rollDiceFor: player1.
 	game finishTurn.
 	player2 := game rollDiceFor: player2.
@@ -629,7 +629,7 @@ RedGameTest >> testUseAnAccelerationCard [
 	player2 := game rollDiceFor: player2.
 	game finishTurn.
 	card := player1 getCard: 'AccelerationCard'.
-	player1 := game usePermanent: card from: player1.
+	player1 := game use: card from: player1.
 	player1 := game rollDiceFor: player1.
 	game finishTurn.
 	player2 := game rollDiceFor: player2.
@@ -670,7 +670,7 @@ RedGameTest >> testUseAnOverloadCard [
 	game finishTurn.
 	player1 := game rollDiceFor: player1.
 	card := player1 set: 'juan' asTargetOf: 'OverloadCard'.
-	player1 := game usePermanent: card from: player1.
+	player1 := game use: card from: player1.
 	game finishTurn.
 	player2 := game rollDiceFor: player2.
 	game finishTurn.

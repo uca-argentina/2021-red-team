@@ -13,10 +13,21 @@ OverloadCard class >> withTarget: player [
 ]
 
 { #category : #actions }
-OverloadCard >> activateEffect: playerName [
+OverloadCard >> effectOn: playerName [
 	^ target = playerName
 		ifTrue: [ -2 ]
 		ifFalse: [ 0 ]
+]
+
+{ #category : #queries }
+OverloadCard >> equalsCard: aCard [
+	^ ((self className = aCard className) & (target = aCard target)).
+]
+
+{ #category : #actions }
+OverloadCard >> from: playerName activateEffect: game [
+	( game whosTurnIsIt = playerName ) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
+	game addToPermanentCards: self.
 ]
 
 { #category : #initialize }
@@ -27,4 +38,9 @@ OverloadCard >> initializeWithTarget: player [
 { #category : #queries }
 OverloadCard >> setTargetAs: playerName [
 	target := playerName.
+]
+
+{ #category : #queries }
+OverloadCard >> target [
+	^ target
 ]
