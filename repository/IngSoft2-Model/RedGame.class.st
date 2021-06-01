@@ -115,6 +115,11 @@ RedGame >> use: card from: player [
 	^ player.
 ]
 
+{ #category : #action }
+RedGame >> useLastBoardEffectOn: playerName [
+	board repeatLastEffectOn: playerName .
+]
+
 { #category : #queries }
 RedGame >> whoWon [
 	(self hasEnded) ifFalse: [ self error: 'the game is still running' ].

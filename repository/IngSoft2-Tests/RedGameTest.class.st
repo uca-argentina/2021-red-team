@@ -525,7 +525,7 @@ RedGameTest >> testRollingADieHandleGivesTheSumOfItsDiceFaces [
 
 { #category : #tests }
 RedGameTest >> testUseACancellationCard [
-	| player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card cards |
+	| player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card cards cardTarget |
 	cards := OrderedCollection new.
 	cards
 		add: OverloadCard new;
@@ -545,11 +545,14 @@ RedGameTest >> testUseACancellationCard [
 		withLaps: 1
 		andWith: players.
 	player1 := game rollDiceFor: player1.
-	card := player1 set: 'juan' asTargetOf: 'OverloadCard'.
+	player1 set: 'juan' asTargetOf: 'OverloadCard'.
+	card := player1 getCard: 'OverloadCard' withTarget: 'juan'.
 	player1 := game use: card from: player1.
 	game finishTurn.
 	player2 := game rollDiceFor: player2.
-	card := player2 setCancellationCardToRemove: OverloadCard withTarget: 'juan'.
+	cardTarget := OverloadCard withTarget: 'juan'.
+	player2 set: cardTarget asTargetOf: 'CancellationCard'.
+	card := player1 getCard: 'CancellationCard' withTarget: cardTarget .
 	player2 := game use: card from: player2.
 	game finishTurn.
 	player1 := game rollDiceFor: player1.
@@ -558,6 +561,38 @@ RedGameTest >> testUseACancellationCard [
 	game finishTurn.
 	self assert: player2 numberOfCards equals: 1.
 	self assert: game numberOfPermanentCards equals: 0.
+]
+
+{ #category : #tests }
+RedGameTest >> testUseARepeatCard [
+	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game card |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: RepeatCard new.
+	cardSource := RandomSource basedOn: cardsDistribution.
+	player1 := Player
+		with: 'martin'
+		andWith: (cardSource produce: 2).
+	aDieHandle := self createADieHandleWithALoadedDie.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 5 to: fifteenRegularCells.
+	self add: SpeedUpCell new times: 1 to: fifteenRegularCells.
+	self add: RegularCell new times: 9 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 1
+		andWith: players.
+	player1 := game rollDiceFor: player1.
+	player1 set: 'martin' asTargetOf: 'RepeatCard'.
+	card := player1 getCard: 'RepeatCard' withTarget: 'martin'.
+	player1 := game use: card from: player1.
+	game finishTurn.
+	self assert: (game positionOf: 'martin') equals: 14.
 ]
 
 { #category : #tests }
@@ -589,7 +624,8 @@ RedGameTest >> testUseASpeedCard [
 	game finishTurn.
 	player2 := game rollDiceFor: player2.
 	game finishTurn.
-	card := player1 set: 'martin' asTargetOf: 'SpeedCard'.
+	player1 set: 'martin' asTargetOf: 'SpeedCard'.
+	card := player1 getCard: 'SpeedCard' withTarget: 'martin'.
 	player1 := game use: card from: player1.
 	player1 := game rollDiceFor: player1.
 	game finishTurn.
@@ -665,15 +701,16 @@ RedGameTest >> testUseAnOverloadCard [
 		withLaps: 1
 		andWith: players.
 	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	player1 := game rollDiceFor: player1.
-	card := player1 set: 'juan' asTargetOf: 'OverloadCard'.
+	player1 set: 'martin' asTargetOf: 'OverloadCard'.
+	card := player1 getCard: 'OverloadCard' withTarget: 'martin'.
 	player1 := game use: card from: player1.
 	game finishTurn.
 	player2 := game rollDiceFor: player2.
 	game finishTurn.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
 	self assert: (player1 numberOfCards) equals: 1.
-	self assert: (game positionOf: 'juan') equals: 10.
+	self assert: (game positionOf: 'martin') equals: 10.
 ]

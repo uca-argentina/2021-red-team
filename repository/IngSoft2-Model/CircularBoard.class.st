@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'cells',
-		'boardOfPositions'
+		'boardOfPositions',
+		'lastCell'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -40,6 +41,7 @@ CircularBoard >> move: player with: rollValue [
 	boardOfPositions updatePositionOf: player with: rollValue.
 	currentPosition := self positionOnLap: player.
 	currentCell := cells at: currentPosition.
+	lastCell := currentCell .
 	currentCell activateEffect: self and: player
 ]
 
@@ -74,6 +76,11 @@ CircularBoard >> positionOnLap: player [
 	positionOnLap = 0
 		ifTrue: [ positionOnLap := cells size ].
 	^ positionOnLap
+]
+
+{ #category : #action }
+CircularBoard >> repeatLastEffectOn: playerName [
+	lastCell activateEffect: self and: playerName. 
 ]
 
 { #category : #actions }

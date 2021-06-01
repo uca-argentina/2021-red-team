@@ -16,3 +16,8 @@ CancellationCard >> from: playerName activateEffect: game [
 CancellationCard >> setTargetAs: aPermanentCard [ 
 	cardTarget := aPermanentCard.
 ]
+
+{ #category : #queries }
+CancellationCard >> target [
+	^cardTarget.
+]

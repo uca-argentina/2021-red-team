@@ -22,6 +22,6 @@ RandomSource >> initializeWith: aPool [
 RandomSource >> produce: size [
 	| collection |
 	collection := OrderedCollection new.
-	size timesRepeat: [ collection add: (pool atRandom) ].
+	size timesRepeat: [ collection add: (pool atRandom) copy  ].
 	^collection.
 ]

@@ -24,6 +24,16 @@ Player >> getCard: aCardClass [
 ]
 
 { #category : #queries }
+Player >> getCard: aCardClass  withTarget: objetive [ 
+	| auxiliaryCards card |
+	auxiliaryCards := cards select: [ :aCard | aCard className = aCardClass ].
+	auxiliaryCards ifEmpty: [ self error: 'cant use a card you dont have' ].
+	card := auxiliaryCards detect: [ :aCard | (aCard target) = objetive  ] 
+		ifNone: [ self error: 'the player doesnt have a card of that class with that target' ]. 
+	^ card.
+]
+
+{ #category : #queries }
 Player >> hasCard: aCard [ 
 	^ cards includes: aCard. 
 ]
@@ -50,22 +60,12 @@ Player >> removeCard: aCard [
 ]
 
 { #category : #actions }
-Player >> set: playerName asTargetOf: aCardClass [
+Player >> set: objetive asTargetOf: aCardClass [
 	| card |
 	card := cards
 		detect: [ :aCard | aCard className = aCardClass ]
-		ifFound: [ :aCard | aCard setTargetAs: playerName ] 
+		ifFound: [ :aCard |  cards remove: aCard.
+			aCard setTargetAs: objetive] 
 		ifNone: [ self error: 'cant use a card you dont have' ].
-	^ card.
-		
-]
-
-{ #category : #actions }
-Player >> setCancellationCardToRemove: aCardClass withTarget: aPlayer [ 
-	| card |
-	card := cards
-		detect: [ :aCard | aCard className = 'CancellationCard' ]
-		ifFound: [ :aCard | aCard setTargetAs: (aCardClass withTarget: aPlayer)]
-		ifNone: [ self error: 'cant use a card you dont have' ].
-	^ card.
+	cards add: card.
 ]

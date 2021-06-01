@@ -12,6 +12,11 @@ OverloadCard class >> withTarget: player [
 	^ self new initializeWithTarget: player.
 ]
 
+{ #category : #queries }
+OverloadCard >> = anotherObject [ 
+	^ self hash = anotherObject hash.
+]
+
 { #category : #actions }
 OverloadCard >> effectOn: playerName [
 	^ target = playerName
@@ -28,6 +33,11 @@ OverloadCard >> equalsCard: aCard [
 OverloadCard >> from: playerName activateEffect: game [
 	( game whosTurnIsIt = playerName ) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
 	game addToPermanentCards: self.
+]
+
+{ #category : #queries }
+OverloadCard >> hash [ 
+	^ (self target hash)*(self className hash).
 ]
 
 { #category : #initialize }
