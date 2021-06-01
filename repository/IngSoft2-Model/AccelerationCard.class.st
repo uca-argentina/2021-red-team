@@ -10,7 +10,7 @@ AccelerationCard >> effectOn: playerName [
 ]
 
 { #category : #actions }
-AccelerationCard >> from: playerName activateEffect: game [ 
-	( game whosTurnIsIt = playerName ) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
+AccelerationCard >> from: player activateEffect: game [ 
+	( game whosTurnIsIt = player name ) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
 	game addToPermanentCards: self.
 ]

@@ -20,8 +20,8 @@ SpeedCard >> equalsCard: aCard [
 ]
 
 { #category : #actions }
-SpeedCard >> from: playerName activateEffect: game [ 
-	( game whosTurnIsIt = playerName ) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
+SpeedCard >> from: player activateEffect: game [ 
+	( game whosTurnIsIt = player name) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
 	game addToPermanentCards: self.
 ]
 

@@ -7,7 +7,8 @@ Class {
 		'laps',
 		'playerSequence',
 		'boardOfPositions',
-		'permanentCards'
+		'permanentCards',
+		'lastCard'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -29,7 +30,7 @@ RedGame >> accumulatePermanentEffectsOn: player [
 
 { #category : #actions }
 RedGame >> addToPermanentCards: permanentCard [
-	permanentCards add: permanentCard. 
+	permanentCards add: permanentCard copy. 
 ]
 
 { #category : #actions }
@@ -110,7 +111,8 @@ RedGame >> rollDiceFor: player [
 { #category : #actions }
 RedGame >> use: card from: player [
 	( player hasCard: card ) ifFalse: [ self error: 'cant use a card thats not yours' ].
-	card from: player name activateEffect: self.
+	card from: player activateEffect: self.
+	lastCard := card copy.
 	player removeCard: card.
 	^ player.
 ]
@@ -118,6 +120,20 @@ RedGame >> use: card from: player [
 { #category : #action }
 RedGame >> useLastBoardEffectOn: playerName [
 	board repeatLastEffectOn: playerName .
+]
+
+{ #category : #actions }
+RedGame >> useLastCardEffectOn: objetive from: player [
+	| card auxCard |
+	auxCard := lastCard copy.
+	player addCard: auxCard.
+	(auxCard className = 'AccelerationCard') 
+	ifTrue: [card := player getCard: auxCard]
+	ifFalse: [player set: objetive asTargetOf: auxCard className.
+				card := player getCard: auxCard className withTarget: objetive.] .
+	
+	self use: card from: player.
+	
 ]
 
 { #category : #queries }

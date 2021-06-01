@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #action }
-RepeatCard >> from: playerName activateEffect: redGame [ 
+RepeatCard >> from: player activateEffect: redGame [ 
 	redGame useLastBoardEffectOn: target.
 ]
 

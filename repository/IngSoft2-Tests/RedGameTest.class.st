@@ -564,6 +564,45 @@ RedGameTest >> testUseACancellationCard [
 ]
 
 { #category : #tests }
+RedGameTest >> testUseARedoCard [
+	| player1 aDieHandle players fifteenRegularCells aCircularBoard game card player2 |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: SpeedCard new;
+		add: RedoCard new.
+	player1 := Player with: 'martin' andWith: cardsDistribution copy.
+	player2 := Player with: 'juan' andWith: cardsDistribution copy.
+	aDieHandle := self createADieHandleWithALoadedDie.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		withLaps: 1
+		andWith: players.
+	player1 := game rollDiceFor: player1.
+	player1 set: 'martin' asTargetOf: 'SpeedCard'.
+	card := player1 getCard: 'SpeedCard' withTarget: 'martin'.
+	player1 := game use: card from: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	player2 set: 'juan' asTargetOf: 'RedoCard'.
+	card := player2 getCard: 'RedoCard' withTarget: 'juan'.
+	player2 := game use: card from: player2.
+	game finishTurn.
+	player1 := game rollDiceFor: player1.
+	game finishTurn.
+	player2 := game rollDiceFor: player2.
+	game finishTurn.
+	self assert: (game positionOf: 'martin') equals: 13.
+	self assert: (game positionOf: 'juan') equals: 13
+]
+
+{ #category : #tests }
 RedGameTest >> testUseARepeatCard [
 	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game card |
 	cardsDistribution := OrderedCollection new.

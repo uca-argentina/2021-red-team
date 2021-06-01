@@ -30,8 +30,8 @@ OverloadCard >> equalsCard: aCard [
 ]
 
 { #category : #actions }
-OverloadCard >> from: playerName activateEffect: game [
-	( game whosTurnIsIt = playerName ) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
+OverloadCard >> from: player activateEffect: game [
+	( game whosTurnIsIt = player name) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
 	game addToPermanentCards: self.
 ]
 

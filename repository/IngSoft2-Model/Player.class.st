@@ -15,6 +15,11 @@ Player class >> with: aName andWith: cards [
 ]
 
 { #category : #actions }
+Player >> addCard: aCard [
+	cards add: aCard.
+]
+
+{ #category : #actions }
 Player >> getCard: aCardClass [
 	| card |
 	card := cards
@@ -64,8 +69,8 @@ Player >> set: objetive asTargetOf: aCardClass [
 	| card |
 	card := cards
 		detect: [ :aCard | aCard className = aCardClass ]
-		ifFound: [ :aCard |  cards remove: aCard.
-			aCard setTargetAs: objetive] 
 		ifNone: [ self error: 'cant use a card you dont have' ].
+	cards remove: card.
+	card setTargetAs: objetive.
 	cards add: card.
 ]
