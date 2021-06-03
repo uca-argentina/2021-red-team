@@ -14,7 +14,7 @@ OverloadCard class >> withTarget: player [
 
 { #category : #queries }
 OverloadCard >> = anotherObject [ 
-	^ self hash = anotherObject hash.
+	^ ((self class = anotherObject class) and: [target = anotherObject target]).
 ]
 
 { #category : #actions }
@@ -37,7 +37,7 @@ OverloadCard >> from: player activateEffect: game [
 
 { #category : #queries }
 OverloadCard >> hash [ 
-	^ (self target hash)*(self className hash).
+	^ self target hash.
 ]
 
 { #category : #initialize }
