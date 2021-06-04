@@ -25,12 +25,26 @@ RedGameTest >> createADieHandleWithALoadedDie [
 RedGameTest >> effectsDistributionGenerator [
 	| effectsDistribution |
 	effectsDistribution := OrderedCollection new.
-	self add: RegularCell new times: 48 to: effectsDistribution.
+	self add: RegularCell new times: 38 to: effectsDistribution.
 	self add: WormHoleCell new times: 20 to: effectsDistribution.
 	self add: SpeedUpCell new times: 20 to: effectsDistribution.
+	self add: CardCell new times: 10 to: effectsDistribution.
 	self add: (MoonWalkCell with: 5) times: 10 to: effectsDistribution.
 	self add: AtomicBombCell new times: 2 to: effectsDistribution.
 	^ effectsDistribution
+]
+
+{ #category : #tests }
+RedGameTest >> randomDeck [
+	| deck |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: OverloadCard new;
+		add: RedoCard new;
+		add: AccelerationCard new;
+		add: RepeatCard new.
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	^ deck
 ]
 
 { #category : #tests }
@@ -304,7 +318,7 @@ RedGameTest >> testAnOverloadMove [
 
 { #category : #tests }
 RedGameTest >> testAskInWhichLapIsThePlayer [
-	| aCircularBoard aDieHandle players aGame tenRegularCells |
+	| aCircularBoard aDieHandle players aGame tenRegularCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	tenRegularCells := OrderedCollection new.
@@ -312,12 +326,14 @@ RedGameTest >> testAskInWhichLapIsThePlayer [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: tenRegularCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 3
 		andWith: players.
-	4 timesRepeat: [ aGame playATurn ].
+	4 timesRepeat: [ aGame playATurnWithoutMoves ].
 	self assert: (aGame lapOf: 'martin') equals: 2.
 	self assert: (aGame lapOf: 'juan') equals: 1.
 	self assert: (aGame lapOf: 'roman') equals: 1
@@ -325,7 +341,7 @@ RedGameTest >> testAskInWhichLapIsThePlayer [
 
 { #category : #tests }
 RedGameTest >> testAskPodiumOfPlayerAfterTheGameEnded [
-	| aCircularBoard aDieHandle players aGame fifteenCells |
+	| aCircularBoard aDieHandle players aGame fifteenCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	fifteenCells := OrderedCollection new.
@@ -336,12 +352,14 @@ RedGameTest >> testAskPodiumOfPlayerAfterTheGameEnded [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame play.
+	aGame playWithoutMoves.
 	self assert: (aGame podiumOf: 'martin') equals: 1.
 	self assert: (aGame podiumOf: 'juan') equals: 2.
 	self assert: (aGame podiumOf: 'roman') equals: 3
@@ -349,7 +367,7 @@ RedGameTest >> testAskPodiumOfPlayerAfterTheGameEnded [
 
 { #category : #tests }
 RedGameTest >> testAskPodiumOfPlayerDuringTheGame [
-	| aCircularBoard aDieHandle players aGame fifteenCells |
+	| aCircularBoard aDieHandle players aGame fifteenCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	fifteenCells := OrderedCollection new.
@@ -360,12 +378,14 @@ RedGameTest >> testAskPodiumOfPlayerDuringTheGame [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 2
 		andWith: players.
-	5 timesRepeat: [ aGame playATurn ].
+	5 timesRepeat: [ aGame playATurnWithoutMoves ].
 	self assert: (aGame podiumOf: 'martin') equals: 1.
 	self assert: (aGame podiumOf: 'juan') equals: 2.
 	self assert: (aGame podiumOf: 'roman') equals: 3
@@ -373,7 +393,7 @@ RedGameTest >> testAskPodiumOfPlayerDuringTheGame [
 
 { #category : #tests }
 RedGameTest >> testCannotAskWhoWonBeforeTheGameEnded [
-	| aCircularBoard aDieHandle players aGame fifteenRegularCells |
+	| aCircularBoard aDieHandle players aGame fifteenRegularCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	fifteenRegularCells := OrderedCollection new.
@@ -381,12 +401,14 @@ RedGameTest >> testCannotAskWhoWonBeforeTheGameEnded [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenRegularCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 2
 		andWith: players.
-	4 timesRepeat: [ aGame playATurn ].
+	4 timesRepeat: [ aGame playATurnWithoutMoves ].
 	self
 		should: [ aGame whoWon ]
 		raise: Error
@@ -436,7 +458,7 @@ RedGameTest >> testCannotCreateADieWithLessThanFourFaces [
 
 { #category : #tests }
 RedGameTest >> testCannotCreateAGameWithInvalidNumberOfLaps [
-	| aCircularBoard aDieHandle players fifteenCells |
+	| aCircularBoard aDieHandle players fifteenCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	fifteenCells := OrderedCollection new.
@@ -447,10 +469,12 @@ RedGameTest >> testCannotCreateAGameWithInvalidNumberOfLaps [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenCells.
+	deck := self randomDeck.
 	self
 		should: [ RedGame
 				with: aCircularBoard
 				with: aDieHandle
+				with: deck
 				withLaps: 0
 				andWith: players ]
 		raise: Error
@@ -459,7 +483,7 @@ RedGameTest >> testCannotCreateAGameWithInvalidNumberOfLaps [
 
 { #category : #tests }
 RedGameTest >> testCannotCreateAGameWithoutPlayers [
-	| aCircularBoard die dice aDieHandle players fifteenCells |
+	| aCircularBoard die dice aDieHandle players fifteenCells deck |
 	die := LoadedDie with: 6.
 	dice := Array with: die.
 	aDieHandle := DieHandle with: dice.
@@ -472,30 +496,17 @@ RedGameTest >> testCannotCreateAGameWithoutPlayers [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenCells.
+	deck := self randomDeck.
 	players := #().
 	self
 		should: [ RedGame
 				with: aCircularBoard
 				with: aDieHandle
+				with: deck
 				withLaps: 2
 				andWith: players ]
 		raise: Error
 		withMessage: 'cannot create a RedGame without players'
-]
-
-{ #category : #tests }
-RedGameTest >> testCannotCreateAPlayerWithoutTwoCards [
-	| cardSource |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: OverloadCard new;
-		add: SpeedCard new;
-		add: AccelerationCard new;
-		add: CancellationCard new;
-		add: RedoCard new;
-		add: RepeatCard new.
-	cardSource := RandomSource basedOn: cardsDistribution.
-	self should: [Player with: 'martin' andWith: (cardSource produce: 0)] raise: Error withMessage: 'invalid number of cards'.
 ]
 
 { #category : #tests }
@@ -516,7 +527,7 @@ RedGameTest >> testCannotCreateARandomSourceWithoutAPool [
 
 { #category : #tests }
 RedGameTest >> testCannotPlayAfterTheGameHasEnded [
-	| aCircularBoard aDieHandle players aGame fifteenCells |
+	| aCircularBoard aDieHandle players aGame fifteenCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	fifteenCells := OrderedCollection new.
@@ -527,39 +538,26 @@ RedGameTest >> testCannotPlayAfterTheGameHasEnded [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenCells.
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: AccelerationCard new.
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame play.
+	aGame playWithoutMoves.
 	self
-		should: [ aGame playATurn ]
+		should: [ aGame playATurnWithoutMoves ]
 		raise: Error
 		withMessage: 'the game has ended'
 ]
 
 { #category : #tests }
-RedGameTest >> testCreatePlayersWithCards [
-	| cardSource player1 |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: OverloadCard new;
-		add: SpeedCard new;
-		add: AccelerationCard new;
-		add: CancellationCard new;
-		add: RedoCard new;
-		add: RepeatCard new.
-	cardSource := RandomSource basedOn: cardsDistribution.
-	player1 := Player
-		with: 'martin'
-		andWith: (cardSource produce: 2).
-	self assert: player1 numberOfCards equals: 2
-]
-
-{ #category : #tests }
 RedGameTest >> testPlayAGameAndAskWhoWon [
-	| aCircularBoard aDieHandle players aGame fifteenRegularCells |
+	| aCircularBoard aDieHandle players aGame fifteenRegularCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	fifteenRegularCells := OrderedCollection new.
@@ -567,18 +565,20 @@ RedGameTest >> testPlayAGameAndAskWhoWon [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenRegularCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame play.
+	aGame playWithoutMoves.
 	self assert: aGame whoWon equals: 'martin'
 ]
 
 { #category : #tests }
 RedGameTest >> testPlayAGameWithARandomBoardAndRandomDice [
-	| aCircularBoard dice aDieHandle players aGame randomCells die1 die2 die3 effectsDistribution effectSource numberOfCells |
+	| aCircularBoard dice aDieHandle players aGame randomCells die1 die2 die3 effectsDistribution effectSource numberOfCells deck |
 	die1 := RandomDie with: 10.
 	die2 := RandomDie with: 8.
 	die3 := RandomDie with: 6.
@@ -590,18 +590,23 @@ RedGameTest >> testPlayAGameWithARandomBoardAndRandomDice [
 	effectSource := RandomSource basedOn: effectsDistribution.
 	randomCells := effectSource produce: numberOfCells.
 	aCircularBoard := CircularBoard with: players andWithAll: randomCells.
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: AccelerationCard new.
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 3
 		andWith: players.
-	aGame play.
+	aGame playWithoutMoves.
 	self assert: aGame hasEnded
 ]
 
 { #category : #tests }
 RedGameTest >> testPlayAGameWithRegularCells [
-	| aCircularBoard aDieHandle players aGame fifteenRegularCells |
+	| aCircularBoard aDieHandle players aGame fifteenRegularCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	fifteenRegularCells := OrderedCollection new.
@@ -609,54 +614,20 @@ RedGameTest >> testPlayAGameWithRegularCells [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenRegularCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame play.
+	aGame playWithoutMoves.
 	self assert: aGame hasEnded
 ]
 
 { #category : #tests }
-RedGameTest >> testPlayATurnAndAskWhoPlaysNext [
-	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: OverloadCard new;
-		add: SpeedCard new;
-		add: AccelerationCard new;
-		add: CancellationCard new;
-		add: RedoCard new;
-		add: RepeatCard new.
-	cardSource := RandomSource basedOn: cardsDistribution.
-	player1 := Player
-		with: 'martin'
-		andWith: (cardSource produce: 2).
-	player2 := Player
-		with: 'juan'
-		andWith: (cardSource produce: 2).
-	aDieHandle := self createADieHandleWithALoadedDie.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 15 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		withLaps: 1
-		andWith: players.
-	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	self assert: (game positionOf: 'martin') equals: 6.
-	self assert: (game whosTurnIsIt) equals: 'juan'.
-]
-
-{ #category : #tests }
 RedGameTest >> testPlayATurnAndLandOnAMoonWalkCell [
-	| aCircularBoard aDieHandle players aGame twelveCells |
+	| aCircularBoard aDieHandle players aGame twelveCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	twelveCells := OrderedCollection new.
@@ -665,15 +636,17 @@ RedGameTest >> testPlayATurnAndLandOnAMoonWalkCell [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: twelveCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 1
 		andWith: players.
-	aGame playATurn;
-			playATurn;
-			playATurn;
-			playATurn.
+	aGame playATurnWithoutMoves;
+			playATurnWithoutMoves;
+			playATurnWithoutMoves;
+			playATurnWithoutMoves.
 	self assert: (aGame positionOf: 'martin') equals: 12.
 	self assert: (aGame positionOf: 'juan') equals: 2.
 	self assert: (aGame positionOf: 'roman') equals: 2.
@@ -681,7 +654,7 @@ RedGameTest >> testPlayATurnAndLandOnAMoonWalkCell [
 
 { #category : #tests }
 RedGameTest >> testPlayATurnAndLandOnARegularCell [
-	| aCircularBoard aDieHandle players aGame tenRegularCells |
+	| aCircularBoard aDieHandle players aGame tenRegularCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	tenRegularCells := OrderedCollection new.
@@ -689,18 +662,20 @@ RedGameTest >> testPlayATurnAndLandOnARegularCell [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: tenRegularCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 1
 		andWith: players.
-	aGame playATurn.
+	aGame playATurnWithoutMoves.
 	self assert: (aGame positionOf: 'martin') equals: 6
 ]
 
 { #category : #tests }
 RedGameTest >> testPlayATurnAndLandOnASpeedUpCell [
-	| aCircularBoard aDieHandle players aGame sixCells |
+	| aCircularBoard aDieHandle players aGame sixCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	sixCells := OrderedCollection new.
@@ -709,18 +684,20 @@ RedGameTest >> testPlayATurnAndLandOnASpeedUpCell [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: sixCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame playATurn.
+	aGame playATurnWithoutMoves.
 	self assert: (aGame positionOf: 'martin') equals: 4
 ]
 
 { #category : #tests }
 RedGameTest >> testPlayATurnAndLandOnAWormHoleCell [
-	| aCircularBoard aDieHandle players aGame sixCells |
+	| aCircularBoard aDieHandle players aGame sixCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	sixCells := OrderedCollection new.
@@ -729,30 +706,34 @@ RedGameTest >> testPlayATurnAndLandOnAWormHoleCell [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: sixCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 1
 		andWith: players.
-	aGame playATurn.
+	aGame playATurnWithoutMoves.
 	self assert: (aGame positionOf: 'martin') equals: 2
 ]
 
 { #category : #tests }
 RedGameTest >> testPlayATurnAndLandOnAnAtomicBombCell [
-	| aCircularBoard aDieHandle players aGame twentyCells |
+	| aCircularBoard aDieHandle players aGame twentyCells deck |
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan' 'roman').
 	twentyCells := OrderedCollection new.
 	self add: RegularCell new times: 10 to: twentyCells.
 	self add: AtomicBombCell new times: 10 to: twentyCells.
 	aCircularBoard := CircularBoard with: players andWithAll: twentyCells.
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
+		with: deck
 		withLaps: 1
 		andWith: players.
-	4 timesRepeat: [ aGame playATurn ].
+	4 timesRepeat: [ aGame playATurnWithoutMoves ].
 	self assert: (aGame positionOf: 'martin') equals: 1.
 	self assert: (aGame positionOf: 'juan') equals: 1.
 	self assert: (aGame positionOf: 'roman') equals: 1.
@@ -826,235 +807,4 @@ RedGameTest >> testRollingADieHandleGivesTheSumOfItsDiceFaces [
 	dice := Array with: die1 with: die2 with: die3.
 	aDieHandle := DieHandle with: dice.
 	self assert: aDieHandle roll equals: 18
-]
-
-{ #category : #tests }
-RedGameTest >> testUseACancellationCard [
-	| player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card cards cardTarget |
-	cards := OrderedCollection new.
-	cards
-		add: OverloadCard new;
-		add: CancellationCard new.
-	player1 := Player with: 'martin' andWith: cards.
-	player2 := Player with: 'juan' andWith: cards copy.
-	aDieHandle := self createADieHandleWithALoadedDie.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 15 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		withLaps: 1
-		andWith: players.
-	player1 := game rollDiceFor: player1.
-	player1 set: 'juan' asTargetOf: 'OverloadCard'.
-	card := player1 getCard: 'OverloadCard' withTarget: 'juan'.
-	player1 := game use: card from: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	cardTarget := OverloadCard withTarget: 'juan'.
-	player2 set: cardTarget asTargetOf: 'CancellationCard'.
-	card := player1 getCard: 'CancellationCard' withTarget: cardTarget .
-	player2 := game use: card from: player2.
-	game finishTurn.
-	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	self assert: player2 numberOfCards equals: 1.
-	self assert: game numberOfPermanentCards equals: 0.
-]
-
-{ #category : #tests }
-RedGameTest >> testUseARedoCard [
-	| player1 aDieHandle players fifteenRegularCells aCircularBoard game card player2 |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: SpeedCard new;
-		add: RedoCard new.
-	player1 := Player with: 'martin' andWith: cardsDistribution copy.
-	player2 := Player with: 'juan' andWith: cardsDistribution copy.
-	aDieHandle := self createADieHandleWithALoadedDie.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 15 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		withLaps: 1
-		andWith: players.
-	player1 := game rollDiceFor: player1.
-	player1 set: 'martin' asTargetOf: 'SpeedCard'.
-	card := player1 getCard: 'SpeedCard' withTarget: 'martin'.
-	player1 := game use: card from: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	player2 set: 'juan' asTargetOf: 'RedoCard'.
-	card := player2 getCard: 'RedoCard' withTarget: 'juan'.
-	player2 := game use: card from: player2.
-	game finishTurn.
-	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	self assert: (game positionOf: 'martin') equals: 13.
-	self assert: (game positionOf: 'juan') equals: 13
-]
-
-{ #category : #tests }
-RedGameTest >> testUseARepeatCard [
-	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game card |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: RepeatCard new.
-	cardSource := RandomSource basedOn: cardsDistribution.
-	player1 := Player
-		with: 'martin'
-		andWith: (cardSource produce: 2).
-	aDieHandle := self createADieHandleWithALoadedDie.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 5 to: fifteenRegularCells.
-	self add: SpeedUpCell new times: 1 to: fifteenRegularCells.
-	self add: RegularCell new times: 9 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		withLaps: 1
-		andWith: players.
-	player1 := game rollDiceFor: player1.
-	player1 set: 'martin' asTargetOf: 'RepeatCard'.
-	card := player1 getCard: 'RepeatCard' withTarget: 'martin'.
-	player1 := game use: card from: player1.
-	game finishTurn.
-	self assert: (game positionOf: 'martin') equals: 14.
-]
-
-{ #category : #tests }
-RedGameTest >> testUseASpeedCard [
-	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: SpeedCard new.
-	cardSource := RandomSource basedOn: cardsDistribution.
-	player1 := Player
-		with: 'martin'
-		andWith: (cardSource produce: 2).
-	player2 := Player
-		with: 'juan'
-		andWith: (cardSource produce: 2).
-	aDieHandle := self createADieHandleWithALoadedDie.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 15 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		withLaps: 1
-		andWith: players.
-	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	player1 set: 'martin' asTargetOf: 'SpeedCard'.
-	card := player1 getCard: 'SpeedCard' withTarget: 'martin'.
-	player1 := game use: card from: player1.
-	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	self assert: (player1 numberOfCards) equals: 1.
-	self assert: (game positionOf: 'martin') equals: 13.
-]
-
-{ #category : #tests }
-RedGameTest >> testUseAnAccelerationCard [
-	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: AccelerationCard new.
-	cardSource := RandomSource basedOn: cardsDistribution.
-	player1 := Player
-		with: 'martin'
-		andWith: (cardSource produce: 2).
-	player2 := Player
-		with: 'juan'
-		andWith: (cardSource produce: 2).
-	aDieHandle := self createADieHandleWithALoadedDie.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 15 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		withLaps: 1
-		andWith: players.
-	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	card := player1 getCard: 'AccelerationCard'.
-	player1 := game use: card from: player1.
-	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	self assert: (player1 numberOfCards) equals: 1.
-	self assert: (game positionOf: 'martin') equals: 13.
-	self assert: (game positionOf: 'juan') equals: 13.
-]
-
-{ #category : #tests }
-RedGameTest >> testUseAnOverloadCard [
-	| cardSource player1 aDieHandle players fifteenRegularCells aCircularBoard game player2 card |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: OverloadCard new.
-	cardSource := RandomSource basedOn: cardsDistribution.
-	player1 := Player
-		with: 'martin'
-		andWith: (cardSource produce: 2).
-	player2 := Player
-		with: 'juan'
-		andWith: (cardSource produce: 2).
-	aDieHandle := self createADieHandleWithALoadedDie.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 15 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		withLaps: 1
-		andWith: players.
-	player1 := game rollDiceFor: player1.
-	player1 set: 'martin' asTargetOf: 'OverloadCard'.
-	card := player1 getCard: 'OverloadCard' withTarget: 'martin'.
-	player1 := game use: card from: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	player1 := game rollDiceFor: player1.
-	game finishTurn.
-	player2 := game rollDiceFor: player2.
-	game finishTurn.
-	self assert: (player1 numberOfCards) equals: 1.
-	self assert: (game positionOf: 'martin') equals: 10.
 ]

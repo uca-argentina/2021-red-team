@@ -14,11 +14,6 @@ TargetMove class >> from: aPlayer with: aCard against: objetive [
 	^ self new initializeWith: aPlayer with: aCard against: objetive.
 ]
 
-{ #category : #'instance creation' }
-TargetMove class >> from: aString with: anOverloadCard to: aString3 [ 
-	self shouldBeImplemented.
-]
-
 { #category : #actions }
 TargetMove >> activateEffect: aRedGame [ 
 	card activateEffectWith: aRedGame and: self.
@@ -31,7 +26,7 @@ TargetMove >> card [
 
 { #category : #actions }
 TargetMove >> changeCard: aCard [ 
-	^ TargetMove from: player with: aCard against: target.
+	^ self class from: player with: aCard against: target.
 ]
 
 { #category : #actions }

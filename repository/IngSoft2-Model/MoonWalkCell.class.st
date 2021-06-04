@@ -13,7 +13,7 @@ MoonWalkCell class >> with: n [
 ]
 
 { #category : #actions }
-MoonWalkCell >> activateEffect: circularBoard and: playerName [
+MoonWalkCell >> activateEffect: circularBoard from: playerName with: aRedGame [ 
 	circularBoard moveEveryone: moveBackwards except: playerName.
 ]
 

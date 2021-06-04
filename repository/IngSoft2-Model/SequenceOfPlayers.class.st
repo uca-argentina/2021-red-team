@@ -26,7 +26,7 @@ SequenceOfPlayers >> initializeWith: players [
 ]
 
 { #category : #queries }
-SequenceOfPlayers >> whosNextBanana [
+SequenceOfPlayers >> whosNext [
 	| currentPlayer |
 	currentPlayer := orderOfPlayers removeFirst.
 	orderOfPlayers addLast: currentPlayer.

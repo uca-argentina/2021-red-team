@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #actions }
-WormHoleCell >> activateEffect: circularBoard and: playerName [
-	 circularBoard updatePositionOf: playerName with: -4.
+WormHoleCell >> activateEffect: circularBoard from: playerName with: aRedGame [ 
+	circularBoard updatePositionOf: playerName with: -4.
 ]

@@ -36,16 +36,6 @@ CircularBoard >> lapOf: playerName [
 ]
 
 { #category : #actions }
-CircularBoard >> move: player with: rollValue [
-	| currentPosition currentCell |
-	boardOfPositions updatePositionOf: player with: rollValue.
-	currentPosition := self positionOnLap: player.
-	currentCell := cells at: currentPosition.
-	lastCell := currentCell .
-	currentCell activateEffect: self and: player
-]
-
-{ #category : #actions }
 CircularBoard >> moveEveryone: n except: player [
 	boardOfPositions moveEveryone: n except: player. 
 ]
@@ -78,9 +68,9 @@ CircularBoard >> positionOnLap: player [
 	^ positionOnLap
 ]
 
-{ #category : #action }
-CircularBoard >> repeatLastEffectOn: playerName [
-	lastCell activateEffect: self and: playerName. 
+{ #category : #actions }
+CircularBoard >> repeatLastEffectOn: playerName with: aRedGame [ 
+	lastCell activateEffect: self from: playerName with: aRedGame. 
 ]
 
 { #category : #actions }

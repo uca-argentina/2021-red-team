@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #actions }
-SpeedUpCell >> activateEffect: circularBoard and: playerName [
-	 circularBoard updatePositionOf: playerName with: 4.
+SpeedUpCell >> activateEffect: circularBoard from: playerName with: aRedGame [ 
+	circularBoard updatePositionOf: playerName with: 4.
 ]

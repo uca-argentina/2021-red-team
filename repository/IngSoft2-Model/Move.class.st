@@ -30,7 +30,7 @@ Move >> changeCard: aCard [
 
 { #category : #queries }
 Move >> effectOn: aPlayer [
-	^ 1.
+	^ card effectOn: aPlayer.
 ]
 
 { #category : #initialize }
