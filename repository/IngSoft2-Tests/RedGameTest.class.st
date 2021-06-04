@@ -89,8 +89,43 @@ RedGameTest >> testACancellationMove [
 ]
 
 { #category : #tests }
+RedGameTest >> testACardCell [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: OverloadCard new;
+		add: SpeedCard new;
+		add: CancellationCard new;
+		add: RedoCard new;
+		add: RepeatCard new.
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	
+	aDieHandle := self createADieHandleWithALoadedDie.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 5 to: fifteenRegularCells.
+	self add: CardCell new times: 1 to: fifteenRegularCells.
+	self add: RegularCell new times: 9 to: fifteenRegularCells.
+	
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		andWith: players.
+		
+	game rollDiceFor: 'martin'.
+	game finishTurn.
+
+	self assert: (game amountOfMoves) equals: 5.
+]
+
+{ #category : #tests }
 RedGameTest >> testARedoMove [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards objectiveMove |
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards |
 	cards := OrderedCollection new.
 	cards	add: OverloadCard new;
 			add: RedoCard new;

@@ -45,6 +45,11 @@ RedGame >> accumulatePermanentEffectsOn: player [
 ]
 
 { #category : #actions }
+RedGame >> addMoveTo: aPlayerName [
+	moves add: (Move from: aPlayerName with: deck takeACard).
+]
+
+{ #category : #actions }
 RedGame >> addToPermanentCards: permanentCard [
 	permanentCards add: permanentCard copy. 
 ]
@@ -52,6 +57,11 @@ RedGame >> addToPermanentCards: permanentCard [
 { #category : #actions }
 RedGame >> addToPermanentMoves: aMove [
 	permanentMoves add: aMove copy.
+]
+
+{ #category : #queries }
+RedGame >> amountOfMoves [
+	^ moves size.
 ]
 
 { #category : #actions }
@@ -163,7 +173,7 @@ RedGame >> rollDiceFor: playerName [
 	| permanentCardsResult |
 	(playerName = playerSequence whosTurnIsIt) ifFalse: [ self error: 'cant play on anothers turn' ].
 	permanentCardsResult := self accumulatePermanentEffectsOn: playerName.
-	board move: playerName with: (self rollDice + permanentCardsResult).
+	board with: self move: playerName with: (self rollDice + permanentCardsResult).
 ]
 
 { #category : #actions }

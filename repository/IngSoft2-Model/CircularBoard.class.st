@@ -92,3 +92,13 @@ CircularBoard >> updatePositionOf: player with: value [
 CircularBoard >> whoWon [
 	^boardOfPositions whosFirst.
 ]
+
+{ #category : #actions }
+CircularBoard >> with: game move: player with: rollValue [
+	| currentPosition currentCell |
+	boardOfPositions updatePositionOf: player with: rollValue.
+	currentPosition := self positionOnLap: player.
+	currentCell := cells at: currentPosition.
+	lastCell := currentCell .
+	currentCell activateEffect: self from: player with: game.
+]
