@@ -8,6 +8,11 @@ Class {
 }
 
 { #category : #actions }
+RedoCard >> activateEffectWith: game and: aTargetMove [ 
+	game useLastCardEffectWith: aTargetMove.
+]
+
+{ #category : #actions }
 RedoCard >> from: player activateEffect: aRedGame [ 
 	aRedGame useLastCardEffectOn: target from: player.
 ]

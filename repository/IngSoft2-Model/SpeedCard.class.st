@@ -8,6 +8,17 @@ Class {
 }
 
 { #category : #actions }
+SpeedCard >> activateEffectWith: game and: aMove [ 
+	( game whosTurnIsIt = aMove source) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
+	game addToPermanentMoves: aMove.
+]
+
+{ #category : #queries }
+SpeedCard >> effect [
+	^ 1.
+]
+
+{ #category : #actions }
 SpeedCard >> effectOn: playerName [
 	^ target = playerName
 		ifTrue: [ 1 ]

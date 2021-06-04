@@ -7,6 +7,11 @@ Class {
 	#category : #'IngSoft2-Model'
 }
 
+{ #category : #actions }
+RepeatCard >> activateEffectWith: redGame and: aMove [ 
+	redGame useLastBoardEffectOn: aMove target.
+]
+
 { #category : #action }
 RepeatCard >> from: player activateEffect: redGame [ 
 	redGame useLastBoardEffectOn: target.
