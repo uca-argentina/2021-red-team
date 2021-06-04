@@ -25,24 +25,27 @@ RedGameTest >> createADieHandleWithALoadedDie [
 RedGameTest >> effectsDistributionGenerator [
 	| effectsDistribution |
 	effectsDistribution := OrderedCollection new.
-	self add: RegularCell new times: 38 to: effectsDistribution.
-	self add: WormHoleCell new times: 20 to: effectsDistribution.
-	self add: SpeedUpCell new times: 20 to: effectsDistribution.
-	self add: CardCell new times: 10 to: effectsDistribution.
-	self add: (MoonWalkCell with: 5) times: 10 to: effectsDistribution.
-	self add: AtomicBombCell new times: 2 to: effectsDistribution.
+	effectsDistribution
+		add: (DiscreteProbabilityEvent of: (RegularCell new) with: 0.38);
+		add: (DiscreteProbabilityEvent of: (WormHoleCell new) with: 0.20);
+		add: (DiscreteProbabilityEvent of: (SpeedUpCell new) with: 0.20);
+		add: (DiscreteProbabilityEvent of: (CardCell new) with: 0.10);
+		add: (DiscreteProbabilityEvent of: (MoonWalkCell with: 5) with: 0.10);
+		add: (DiscreteProbabilityEvent of: (AtomicBombCell new) with: 0.02).
 	^ effectsDistribution
 ]
 
 { #category : #tests }
 RedGameTest >> randomDeck [
-	| deck |
+	| deck  |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
-		add: OverloadCard new;
-		add: RedoCard new;
-		add: AccelerationCard new;
-		add: RepeatCard new.
+		add: (DiscreteProbabilityEvent of: (OverloadCard new) with: 0.17);
+		add: (DiscreteProbabilityEvent of: (RedoCard  new) with: 0.17);
+		add: (DiscreteProbabilityEvent of: (AccelerationCard  new) with: 0.17);
+		add: (DiscreteProbabilityEvent of: (RepeatCard  new) with: 0.17);
+		add: (DiscreteProbabilityEvent of: (CancellationCard new) with: 0.16);
+		add: (DiscreteProbabilityEvent of: (SpeedCard  new) with: 0.16).
 	deck := Deck with: (RandomSource basedOn: cardsDistribution).
 	^ deck
 ]
@@ -60,12 +63,12 @@ RedGameTest >> should: block raise: kindOfError withMessage: expectedMessage [
 RedGameTest >> testACancellationMove [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards objectiveMove |
 	cards := OrderedCollection new.
-	cards	add: OverloadCard new;
-			add: CancellationCard new;
-			add: OverloadCard new;
-			add: RepeatCard new.
+	cards
+		add: OverloadCard new;
+		add: CancellationCard new;
+		add: OverloadCard new;
+		add: RepeatCard new.
 	deck := LoadedDeck with: cards.
-	
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -80,47 +83,46 @@ RedGameTest >> testACancellationMove [
 		withLaps: 1
 		andWith: players.
 	game rollDiceFor: 'martin'.
-	move := TargetMove from: 'martin' with: OverloadCard new against: 'juan'.
+	move := TargetMove
+		from: 'martin'
+		with: OverloadCard new
+		against: 'juan'.
 	game play: move.
 	game finishTurn.
-
-	move := TargetMove from: 'juan' with: OverloadCard new against: 'martin'.
+	move := TargetMove
+		from: 'juan'
+		with: OverloadCard new
+		against: 'martin'.
 	game play: move.
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-
-	objectiveMove := TargetMove from: 'juan' with: OverloadCard new against: 'martin'.
-	move := TargetMove from: 'martin' with: CancellationCard new against: objectiveMove.
+	objectiveMove := TargetMove
+		from: 'juan'
+		with: OverloadCard new
+		against: 'martin'.
+	move := TargetMove
+		from: 'martin'
+		with: CancellationCard new
+		against: objectiveMove.
 	game play: move.
 	game rollDiceFor: 'martin'.
 	game finishTurn.
-	
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-
 	self assert: (game positionOf: 'juan') equals: 8.
-	self assert: (game positionOf: 'martin') equals: 12.
+	self assert: (game positionOf: 'martin') equals: 12
 ]
 
 { #category : #tests }
 RedGameTest >> testACardCell [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: OverloadCard new;
-		add: SpeedCard new;
-		add: CancellationCard new;
-		add: RedoCard new;
-		add: RepeatCard new.
-	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	
+	deck := self randomDeck.
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
 	self add: RegularCell new times: 5 to: fifteenRegularCells.
 	self add: CardCell new times: 1 to: fifteenRegularCells.
 	self add: RegularCell new times: 9 to: fifteenRegularCells.
-	
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenRegularCells.
@@ -130,23 +132,21 @@ RedGameTest >> testACardCell [
 		with: deck
 		withLaps: 1
 		andWith: players.
-		
 	game rollDiceFor: 'martin'.
 	game finishTurn.
-
-	self assert: (game amountOfMoves) equals: 5.
+	self assert: game amountOfMoves equals: 5
 ]
 
 { #category : #tests }
 RedGameTest >> testARedoMove [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards |
 	cards := OrderedCollection new.
-	cards	add: OverloadCard new;
-			add: RedoCard new;
-			add: SpeedCard new;
-			add: RepeatCard new.
+	cards
+		add: OverloadCard new;
+		add: RedoCard new;
+		add: SpeedCard new;
+		add: RepeatCard new.
 	deck := LoadedDeck with: cards.
-	
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -161,25 +161,27 @@ RedGameTest >> testARedoMove [
 		withLaps: 1
 		andWith: players.
 	game rollDiceFor: 'martin'.
-	move := TargetMove from: 'martin' with: OverloadCard new against: 'juan'.
+	move := TargetMove
+		from: 'martin'
+		with: OverloadCard new
+		against: 'juan'.
 	game play: move.
 	game finishTurn.
-
 	move := TargetMove from: 'juan' with: SpeedCard new against: 'juan'.
 	game play: move.
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-
-	move := TargetMove from: 'martin' with: RedoCard new against: 'martin'.
+	move := TargetMove
+		from: 'martin'
+		with: RedoCard new
+		against: 'martin'.
 	game play: move.
 	game rollDiceFor: 'martin'.
 	game finishTurn.
-	
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-
 	self assert: (game positionOf: 'juan') equals: 10.
-	self assert: (game positionOf: 'martin') equals: 13.
+	self assert: (game positionOf: 'martin') equals: 13
 ]
 
 { #category : #tests }
@@ -187,9 +189,8 @@ RedGameTest >> testARepeatMove [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
-		add: RepeatCard new.
+		add: (DiscreteProbabilityEvent of: RepeatCard new with: 1).
 	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -211,9 +212,8 @@ RedGameTest >> testARepeatMove [
 	game play: move.
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-
 	self assert: (game positionOf: 'juan') equals: 10.
-	self assert: (game positionOf: 'martin') equals: 10.
+	self assert: (game positionOf: 'martin') equals: 10
 ]
 
 { #category : #tests }
@@ -221,9 +221,8 @@ RedGameTest >> testASpeedMove [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
-		add: SpeedCard new.
+		add: (DiscreteProbabilityEvent of: SpeedCard new with: 1).
 	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -238,7 +237,10 @@ RedGameTest >> testASpeedMove [
 		withLaps: 1
 		andWith: players.
 	game rollDiceFor: 'martin'.
-	move := TargetMove from: 'martin' with: SpeedCard new against: 'martin'.
+	move := TargetMove
+		from: 'martin'
+		with: SpeedCard new
+		against: 'martin'.
 	game play: move.
 	game finishTurn.
 	game rollDiceFor: 'juan'.
@@ -248,7 +250,7 @@ RedGameTest >> testASpeedMove [
 	game rollDiceFor: 'juan'.
 	game finishTurn.
 	self assert: (game positionOf: 'juan') equals: 12.
-	self assert: (game positionOf: 'martin') equals: 13.
+	self assert: (game positionOf: 'martin') equals: 13
 ]
 
 { #category : #tests }
@@ -256,9 +258,8 @@ RedGameTest >> testAnAccelerationMove [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
-		add: AccelerationCard new.
+		add: (DiscreteProbabilityEvent of: AccelerationCard new with: 1).
 	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -283,7 +284,7 @@ RedGameTest >> testAnAccelerationMove [
 	game rollDiceFor: 'juan'.
 	game finishTurn.
 	self assert: (game positionOf: 'juan') equals: 14.
-	self assert: (game positionOf: 'martin') equals: 13.
+	self assert: (game positionOf: 'martin') equals: 13
 ]
 
 { #category : #tests }
@@ -291,9 +292,8 @@ RedGameTest >> testAnOverloadMove [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
-		add: OverloadCard new.
+		add: (DiscreteProbabilityEvent of: OverloadCard new with: 1).
 	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -308,12 +308,15 @@ RedGameTest >> testAnOverloadMove [
 		withLaps: 1
 		andWith: players.
 	game rollDiceFor: 'martin'.
-	move := TargetMove from: 'martin' with: OverloadCard new against: 'juan'.
+	move := TargetMove
+		from: 'martin'
+		with: OverloadCard new
+		against: 'juan'.
 	game play: move.
 	game finishTurn.
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-	self assert: (game positionOf: 'juan') equals: 4.
+	self assert: (game positionOf: 'juan') equals: 4
 ]
 
 { #category : #tests }
@@ -518,11 +521,11 @@ RedGameTest >> testCannotCreateAPositionWithoutName [
 ]
 
 { #category : #tests }
-RedGameTest >> testCannotCreateARandomSourceWithoutAPool [
+RedGameTest >> testCannotCreateARandomSourceWithoutAEventsDistribution [
 	self
 		should: [ RandomSource basedOn: OrderedCollection new ]
 		raise: Error
-		withMessage: 'cant create a RandomSource without a pool'
+		withMessage: 'cant create a RandomSource without a events distribution'.
 ]
 
 { #category : #tests }
@@ -539,9 +542,7 @@ RedGameTest >> testCannotPlayAfterTheGameHasEnded [
 		with: players
 		andWithAll: fifteenCells.
 	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: AccelerationCard new.
-	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	deck := self randomDeck .
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
@@ -590,10 +591,7 @@ RedGameTest >> testPlayAGameWithARandomBoardAndRandomDice [
 	effectSource := RandomSource basedOn: effectsDistribution.
 	randomCells := effectSource produce: numberOfCells.
 	aCircularBoard := CircularBoard with: players andWithAll: randomCells.
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: AccelerationCard new.
-	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
 		with: aDieHandle
@@ -736,19 +734,19 @@ RedGameTest >> testPlayATurnAndLandOnAnAtomicBombCell [
 	4 timesRepeat: [ aGame playATurnWithoutMoves ].
 	self assert: (aGame positionOf: 'martin') equals: 1.
 	self assert: (aGame positionOf: 'juan') equals: 1.
-	self assert: (aGame positionOf: 'roman') equals: 1.
+	self assert: (aGame positionOf: 'roman') equals: 1
 ]
 
 { #category : #tests }
 RedGameTest >> testRedoAnAccelerationMove [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards |
 	cards := OrderedCollection new.
-	cards	add: OverloadCard new;
-			add: RedoCard new;
-			add: AccelerationCard new;
-			add: RepeatCard new.
+	cards
+		add: OverloadCard new;
+		add: RedoCard new;
+		add: AccelerationCard new;
+		add: RepeatCard new.
 	deck := LoadedDeck with: cards.
-	
 	aDieHandle := self createADieHandleWithALoadedDie.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -763,25 +761,24 @@ RedGameTest >> testRedoAnAccelerationMove [
 		withLaps: 1
 		andWith: players.
 	game rollDiceFor: 'martin'.
-	move := TargetMove from: 'martin' with: OverloadCard new against: 'juan'.
+	move := TargetMove
+		from: 'martin'
+		with: OverloadCard new
+		against: 'juan'.
 	game play: move.
 	game finishTurn.
-
 	move := Move from: 'juan' with: AccelerationCard new.
 	game play: move.
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-
 	move := Move from: 'martin' with: RedoCard new.
 	game play: move.
 	game rollDiceFor: 'martin'.
 	game finishTurn.
-	
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-
 	self assert: (game positionOf: 'juan') equals: 11.
-	self assert: (game positionOf: 'martin') equals: 14.
+	self assert: (game positionOf: 'martin') equals: 14
 ]
 
 { #category : #tests }

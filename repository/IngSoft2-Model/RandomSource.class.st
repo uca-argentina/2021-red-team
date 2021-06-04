@@ -2,26 +2,33 @@ Class {
 	#name : #RandomSource,
 	#superclass : #Object,
 	#instVars : [
-		'pool'
+		'pool',
+		'randomness'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'instance creation' }
-RandomSource class >> basedOn: aPool [
-	aPool ifEmpty: [ self error: 'cant create a RandomSource without a pool' ].
-	^self new initializeWith: aPool .
+RandomSource class >> basedOn: eventsDistribution [
+	eventsDistribution ifEmpty: [ self error: 'cant create a RandomSource without a events distribution' ].
+	^self new initializeWith: eventsDistribution .
 ]
 
 { #category : #initialize }
-RandomSource >> initializeWith: aPool [
-	pool := aPool .
+RandomSource >> initializeWith: eventsDistribution [
+	randomness := Random new.
+	pool := OrderedCollection new.
+	eventsDistribution
+		do: [ :probabilityEvent | 
+			pool
+				add: probabilityEvent event
+				withOccurrences: (probabilityEvent probability * 100) asInteger ].
 ]
 
 { #category : #action }
 RandomSource >> produce: size [
 	| collection |
 	collection := OrderedCollection new.
-	size timesRepeat: [ collection add: (pool atRandom) copy  ].
+	size timesRepeat: [ collection add: (pool atRandom: randomness) copy  ].
 	^collection.
 ]
