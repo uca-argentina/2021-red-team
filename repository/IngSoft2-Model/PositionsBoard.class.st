@@ -8,23 +8,14 @@ Class {
 }
 
 { #category : #'instance creation' }
-PositionsBoard class >> with: players [
-	players ifEmpty: [ self error: 'cannot create a boardOfPositions without players' ].
-	^ self new initializeWith: players.
+PositionsBoard class >> with: somePositions [
+	somePositions ifEmpty: [ self error: 'cannot create a boardOfPositions without positions' ].
+	^ self new initializeWith: somePositions .
 ]
 
 { #category : #queries }
 PositionsBoard >> anyPlayerFinished: laps withBoardOfSize: cells [
 	^ (positions anySatisfy: [ :position | (position valueOfPosition) > (cells*laps) ]).
-]
-
-{ #category : #actions }
-PositionsBoard >> createNewPositionsWith: newPosition at: indexOfPosition [
-	| newPositions |
-	newPositions := positions copy.
-	newPositions removeAt: indexOfPosition.
-	newPositions add: newPosition beforeIndex: indexOfPosition.
-	^ newPositions
 ]
 
 { #category : #queries }
@@ -33,10 +24,8 @@ PositionsBoard >> findPositionOf: name in: collection [
 ]
 
 { #category : #initialize }
-PositionsBoard >> initializeWith: players [
-	| auxiliarPositions |
-	auxiliarPositions := players collect: [ :player | (Position from: player)].
-	positions := auxiliarPositions asOrderedCollection .
+PositionsBoard >> initializeWith: somePositions [
+	positions := somePositions.
 	
 ]
 
@@ -57,10 +46,13 @@ PositionsBoard >> moveEveryone: n except: player [
 { #category : #actions }
 PositionsBoard >> moveEveryoneToTheBeginningOfTheLapWithSize: lapSize [
 	| moveBackwards actualPositionOnLap |
-	positions do: [ :position | 
-		actualPositionOnLap := position valueOfPosition \\ lapSize.
-		moveBackwards := -1*actualPositionOnLap.
-		self updatePositionOf: (position nameOfPlayer) with: moveBackwards ].
+	positions
+		do: [ :position | 
+			actualPositionOnLap := position valueOfPosition \\ lapSize.
+			moveBackwards := actualPositionOnLap = 0
+				ifTrue: [ -1 * lapSize + 1 ]
+				ifFalse: [ -1 * actualPositionOnLap + 1 ].
+			self updatePositionOf: position nameOfPlayer with: moveBackwards ]
 ]
 
 { #category : #queries }
@@ -69,19 +61,19 @@ PositionsBoard >> orderedPositions [
 ]
 
 { #category : #queries }
-PositionsBoard >> podiumOf: name [
-	| podium positionOfPlayer indexOfPlayer |
-	podium := self orderedPositions.
-	positionOfPlayer := self findPositionOf: name in: podium.
-	indexOfPlayer := podium indexOf: positionOfPlayer.
-	^ indexOfPlayer
-]
-
-{ #category : #queries }
 PositionsBoard >> positionOf: name [  
 	| position |
 	position := self findPositionOf: name in: positions.
 	^ position valueOfPosition.
+]
+
+{ #category : #queries }
+PositionsBoard >> rankingOf: name [
+	| ranking positionOfPlayer indexOfPlayer |
+	ranking := self orderedPositions.
+	positionOfPlayer := self findPositionOf: name in: ranking.
+	indexOfPlayer := ranking indexOf: positionOfPlayer.
+	^ indexOfPlayer
 ]
 
 { #category : #actions }
@@ -92,14 +84,10 @@ PositionsBoard >> selectAllPositionsExcept: player [
 
 { #category : #actions }
 PositionsBoard >> updatePositionOf: name with: value [
-	| newPosition oldPosition indexOfPosition newPositions |
+	| newPosition oldPosition |
 	oldPosition := self findPositionOf: name in: positions.
-	newPosition := oldPosition updatePosition: value.
-	indexOfPosition := positions indexOf: oldPosition.
-	newPositions := self
-		createNewPositionsWith: newPosition
-		at: indexOfPosition.
-	positions := newPositions
+	newPosition := oldPosition updateWith: value.
+	positions replaceAll: oldPosition with: newPosition.
 ]
 
 { #category : #queries }

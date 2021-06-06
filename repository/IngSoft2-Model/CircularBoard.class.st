@@ -3,57 +3,53 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'cells',
-		'boardOfPositions',
-		'lastCell'
+		'lastCell',
+		'positionsBoard'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'instance creation' }
 CircularBoard class >> with: players andWithAll: cells [
-	| boardOfPositions |
+	| boardOfPositions positions|
 	cells ifEmpty: [ self error: 'cant create a board without cells' ].
 	players ifEmpty: [ self error: 'cant create a board without players' ].
-	boardOfPositions := PositionsBoard with: players.
+	positions := players collect: [ :player | (Position from: player)].
+	boardOfPositions := PositionsBoard with: positions asOrderedCollection.
 	^ self new initializeWith: boardOfPositions andWithAll: cells.
 ]
 
 { #category : #queries }
 CircularBoard >> anyPlayerFinished: laps [
-	^ boardOfPositions anyPlayerFinished: laps withBoardOfSize: cells size.
+	^ positionsBoard anyPlayerFinished: laps withBoardOfSize: cells size.
 ]
 
 { #category : #initialize }
 CircularBoard >> initializeWith: positions andWithAll: collectionOfCells [
 	cells := collectionOfCells.
-	boardOfPositions := positions.
+	positionsBoard := positions.
 	
 ]
 
 { #category : #queries }
 CircularBoard >> lapOf: playerName [
-	^ boardOfPositions lapOf: playerName withLapSize: (cells size).
+	^ positionsBoard lapOf: playerName withLapSize: (cells size).
 ]
 
 { #category : #actions }
 CircularBoard >> moveEveryone: n except: player [
-	boardOfPositions moveEveryone: n except: player. 
+	positionsBoard moveEveryone: n except: player. 
 ]
 
 { #category : #actions }
 CircularBoard >> moveEveryoneToTheBeginningOfTheLap [
-	boardOfPositions moveEveryoneToTheBeginningOfTheLapWithSize: cells size.
-]
-
-{ #category : #queries }
-CircularBoard >> podiumOf: name [ 
-	^ boardOfPositions podiumOf: name .
+	positionsBoard moveEveryoneToTheBeginningOfTheLapWithSize: cells size.
 ]
 
 { #category : #queries }
 CircularBoard >> positionOf: player [
 	| position |
-	position := boardOfPositions positionOf: player.
+	position := positionsBoard positionOf: player.
 	^ (position > (cells size)) ifTrue: [ position \\ (cells size)]
 									  ifFalse: [ position ].
 ]
@@ -61,11 +57,16 @@ CircularBoard >> positionOf: player [
 { #category : #actions }
 CircularBoard >> positionOnLap: player [
 	| position positionOnLap |
-	position := boardOfPositions positionOf: player.
+	position := positionsBoard positionOf: player.
 	positionOnLap := position \\ cells size.
 	positionOnLap = 0
 		ifTrue: [ positionOnLap := cells size ].
 	^ positionOnLap
+]
+
+{ #category : #queries }
+CircularBoard >> rankingOf: name [ 
+	^ positionsBoard rankingOf: name .
 ]
 
 { #category : #actions }
@@ -75,18 +76,18 @@ CircularBoard >> repeatLastEffectOn: playerName with: aRedGame [
 
 { #category : #actions }
 CircularBoard >> updatePositionOf: player with: value [  
-	boardOfPositions updatePositionOf: player with: value. 
+	positionsBoard updatePositionOf: player with: value. 
 ]
 
 { #category : #queries }
 CircularBoard >> whoWon [
-	^boardOfPositions whosFirst.
+	^positionsBoard whosFirst.
 ]
 
 { #category : #actions }
 CircularBoard >> with: game move: player with: rollValue [
 	| currentPosition currentCell |
-	boardOfPositions updatePositionOf: player with: rollValue.
+	positionsBoard updatePositionOf: player with: rollValue.
 	currentPosition := self positionOnLap: player.
 	currentCell := cells at: currentPosition.
 	lastCell := currentCell .

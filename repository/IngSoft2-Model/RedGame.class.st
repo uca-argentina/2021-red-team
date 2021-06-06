@@ -6,8 +6,6 @@ Class {
 		'board',
 		'laps',
 		'playerSequence',
-		'permanentCards',
-		'lastCard',
 		'deck',
 		'moves',
 		'positionsBoard',
@@ -83,7 +81,7 @@ RedGame >> play: aMove [
 		ifFound: [ :move | moves remove: move ]
 		ifNone: [ self error: 'cant use a card thats not yours' ].
 	aMove activateEffect: self.
-	lastMove := aMove copy.
+	(aMove card class = RedoCard) ifFalse: [lastMove := aMove copy.].
 ]
 
 { #category : #actions }
@@ -100,13 +98,13 @@ RedGame >> playWithoutMoves [
 ]
 
 { #category : #queries }
-RedGame >> podiumOf: name [
-	^ board podiumOf: name.
+RedGame >> positionOf: nameOfPlayer [
+	^ board positionOf: nameOfPlayer.
 ]
 
 { #category : #queries }
-RedGame >> positionOf: nameOfPlayer [
-	^ board positionOf: nameOfPlayer.
+RedGame >> rankingOf: name [
+	^ board rankingOf: name.
 ]
 
 { #category : #actions }

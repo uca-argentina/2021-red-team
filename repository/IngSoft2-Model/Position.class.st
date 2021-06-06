@@ -36,7 +36,7 @@ Position >> nameOfPlayer [
 ]
 
 { #category : #actions }
-Position >> updatePosition: distance [
+Position >> updateWith: distance [
 	| newValue newPosition |
 	newValue := (reach + distance) max: 1.
 	newPosition := self class from: player with: newValue.
