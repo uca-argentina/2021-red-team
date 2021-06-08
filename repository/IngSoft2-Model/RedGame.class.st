@@ -76,12 +76,14 @@ RedGame >> lapOf: playerName [
 
 { #category : #actions }
 RedGame >> play: aMove [
+	self validateMoveAndCardType: aMove.
 	moves
-		detect: [:move | (move source = aMove source) and: [(move card) class = (aMove card) class]]
+		detect: [ :move | move source = aMove source and: [ move card class = aMove card class ] ]
 		ifFound: [ :move | moves remove: move ]
 		ifNone: [ self error: 'cant use a card thats not yours' ].
 	aMove activateEffect: self.
-	(aMove card class = RedoCard) ifFalse: [lastMove := aMove copy.].
+	aMove card class = RedoCard
+		ifFalse: [ lastMove := aMove copy ]
 ]
 
 { #category : #actions }
@@ -140,6 +142,19 @@ RedGame >> useLastCardEffectWith: aMove [
 	newMove := aMove changeCard: newCard.
 	moves add: newMove.
 	self play: newMove.
+]
+
+{ #category : #actions }
+RedGame >> validateMoveAndCardType: aMove [
+	| checkTargetMove checkAccelerationMove  checkRedoMove|
+	checkTargetMove := aMove class = TargetMove.
+	checkAccelerationMove := aMove card class = AccelerationCard.
+	checkRedoMove := aMove card class = RedoCard.
+	(checkTargetMove and: [ checkAccelerationMove  ])
+		ifTrue: [ self error: 'cant play an AccelerationCard with a target' ].
+	(checkTargetMove not and: [ checkAccelerationMove  not and: [checkRedoMove not] ])
+		ifTrue: [ self
+				error: 'cant play an ' , aMove card className , ' without a target' ]
 ]
 
 { #category : #queries }

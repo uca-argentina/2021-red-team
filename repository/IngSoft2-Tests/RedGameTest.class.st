@@ -517,6 +517,36 @@ RedGameTest >> testCannotCreateARandomSourceWithoutAEventsDistribution [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotPlayAMoveWithTargetedCard [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: OverloadCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		andWith: players.
+	game rollDiceFor: 'martin'.
+	move := Move
+		from: 'martin'
+		with: OverloadCard new.
+	self
+		should: [ game play: move]
+		raise: Error
+		withMessage: 'cant play an OverloadCard without a target'.
+]
+
+{ #category : #tests }
 RedGameTest >> testCannotPlayARedoMoveWithoutAnyPreviewsMoves [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
 	cardsDistribution := OrderedCollection new.
@@ -541,6 +571,34 @@ RedGameTest >> testCannotPlayARedoMoveWithoutAnyPreviewsMoves [
 		against: 'martin'.
 	self should: [ game play: move ] raise: Error
 		withMessage: 'Cant use a Redo Card without previews moves'.
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotPlayATargetMoveWithAnAccelerationCard [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: AccelerationCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		andWith: players.
+	game rollDiceFor: 'martin'.
+	move := TargetMove from: 'martin' with: AccelerationCard new against: 'martin'.
+	self
+		should: [ game play: move]
+		raise: Error
+		withMessage: 'cant play an AccelerationCard with a target'.
 ]
 
 { #category : #tests }
