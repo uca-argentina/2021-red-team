@@ -14,3 +14,8 @@ AccelerationCard >> activateEffectWith: game and: aMove [
 AccelerationCard >> effect [
 	^ 1.
 ]
+
+{ #category : #actions }
+AccelerationCard >> equals: anotherCard [
+	^ self class = anotherCard class.
+]

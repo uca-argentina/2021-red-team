@@ -8,3 +8,8 @@ Class {
 RedoCard >> activateEffectWith: game and: aTargetMove [ 
 	game useLastCardEffectWith: aTargetMove.
 ]
+
+{ #category : #actions }
+RedoCard >> equals: anotherCard [
+	^ self class = anotherCard class.
+]

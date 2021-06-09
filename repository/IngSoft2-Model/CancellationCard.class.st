@@ -8,3 +8,8 @@ Class {
 CancellationCard >> activateEffectWith: game and: aMove [ 
 	game removePermanentMove: (aMove target).
 ]
+
+{ #category : #actions }
+CancellationCard >> equals: anotherCard [
+	^ self class = anotherCard class.
+]

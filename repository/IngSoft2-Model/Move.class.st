@@ -10,6 +10,7 @@ Class {
 
 { #category : #'instance creation' }
 Move class >> from: aPlayer with: aCard [
+	((aCard equals: AccelerationCard new) or: [aCard equals: RedoCard new]) ifFalse: [ self error: 'Cant create a move for ', aCard className,' without target' ].
 	^ self new initializeWith: aPlayer andWith: aCard.
 ]
 
@@ -25,7 +26,7 @@ Move >> card [
 
 { #category : #actions }
 Move >> changeCard: aCard [ 
-	^ Move from: player with: aCard.
+	^ self class from: player with: aCard.
 ]
 
 { #category : #queries }

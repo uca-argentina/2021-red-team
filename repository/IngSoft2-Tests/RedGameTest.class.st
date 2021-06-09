@@ -518,7 +518,7 @@ RedGameTest >> testCannotCreateARandomSourceWithoutAEventsDistribution [
 
 { #category : #tests }
 RedGameTest >> testCannotPlayAMoveWithTargetedCard [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
 		add: (DiscreteProbabilityEvent of: OverloadCard new with: 1).
@@ -537,13 +537,10 @@ RedGameTest >> testCannotPlayAMoveWithTargetedCard [
 		withLaps: 1
 		andWith: players.
 	game rollDiceFor: 'martin'.
-	move := Move
-		from: 'martin'
-		with: OverloadCard new.
 	self
-		should: [ game play: move]
+		should: [Move from: 'martin' with: OverloadCard new ]
 		raise: Error
-		withMessage: 'cant play an OverloadCard without a target'.
+		withMessage: 'Cant create a move for OverloadCard without target'
 ]
 
 { #category : #tests }
@@ -575,7 +572,7 @@ RedGameTest >> testCannotPlayARedoMoveWithoutAnyPreviewsMoves [
 
 { #category : #tests }
 RedGameTest >> testCannotPlayATargetMoveWithAnAccelerationCard [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
 		add: (DiscreteProbabilityEvent of: AccelerationCard new with: 1).
@@ -594,11 +591,10 @@ RedGameTest >> testCannotPlayATargetMoveWithAnAccelerationCard [
 		withLaps: 1
 		andWith: players.
 	game rollDiceFor: 'martin'.
-	move := TargetMove from: 'martin' with: AccelerationCard new against: 'martin'.
 	self
-		should: [ game play: move]
+		should: [ TargetMove from: 'martin' with: AccelerationCard new against: 'martin'.]
 		raise: Error
-		withMessage: 'cant play an AccelerationCard with a target'.
+		withMessage: 'Cant create a Target Move with an AccelerationCard'.
 ]
 
 { #category : #tests }

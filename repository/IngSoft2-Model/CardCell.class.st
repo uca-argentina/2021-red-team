@@ -6,5 +6,5 @@ Class {
 
 { #category : #actions }
 CardCell >> activateEffect: board from: aPlayerName with: game [ 
-	game addMoveTo: aPlayerName.
+	game addCardTo: aPlayerName.
 ]

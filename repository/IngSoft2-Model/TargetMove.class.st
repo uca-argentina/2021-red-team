@@ -11,6 +11,7 @@ Class {
 
 { #category : #'instance creation' }
 TargetMove class >> from: aPlayer with: aCard against: objetive [
+	(aCard equals: AccelerationCard new) ifTrue: [ self error: 'Cant create a Target Move with an AccelerationCard' ].
 	^ self new initializeWith: aPlayer with: aCard against: objetive.
 ]
 

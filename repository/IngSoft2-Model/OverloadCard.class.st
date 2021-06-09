@@ -14,3 +14,8 @@ OverloadCard >> activateEffectWith: game and: aMove [
 OverloadCard >> effect [
 	^ -2
 ]
+
+{ #category : #queries }
+OverloadCard >> equals: anotherCard [
+	^ self class = anotherCard class.
+]

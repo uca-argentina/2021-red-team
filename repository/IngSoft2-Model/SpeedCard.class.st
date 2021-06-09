@@ -14,3 +14,8 @@ SpeedCard >> activateEffectWith: game and: aMove [
 SpeedCard >> effect [
 	^ 1.
 ]
+
+{ #category : #queries }
+SpeedCard >> equals: anotherCard [
+	^ self class = anotherCard class.
+]

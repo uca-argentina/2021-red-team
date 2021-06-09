@@ -8,3 +8,8 @@ Class {
 RepeatCard >> activateEffectWith: redGame and: aMove [ 
 	redGame useLastBoardEffectOn: aMove target.
 ]
+
+{ #category : #actions }
+RepeatCard >> equals: anotherCard [
+	^ self class = anotherCard class.
+]

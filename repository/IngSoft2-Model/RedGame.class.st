@@ -7,24 +7,24 @@ Class {
 		'laps',
 		'playerSequence',
 		'deck',
-		'moves',
 		'positionsBoard',
 		'lastMove',
-		'permanentMoves'
+		'permanentMoves',
+		'assignatedCards'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'instance creation' }
 RedGame class >> with: aCircularBoard with: aDieHandle with: aDeck withLaps: aNumberOfLaps andWith: players [
-	| aSequence aBoardOfPositions auxMoves |
+	| aSequence aBoardOfPositions auxCards |
 	players ifEmpty: [ self error: 'cannot create a RedGame without players' ].
 	(aNumberOfLaps > 0) ifFalse: [ self error: 'invalid number of laps' ].
 	aSequence := SequenceOfPlayers with: players.
 	aBoardOfPositions := PositionsBoard with: players.
-	auxMoves := OrderedCollection new.
-	players do: [ :playerName | 2 timesRepeat: [auxMoves add: (Move from: playerName with: (aDeck takeACard))]].
-	^ self new initializeWith: aCircularBoard with: aDieHandle with: aDeck withLaps: aNumberOfLaps with: aSequence with: auxMoves andWith: aBoardOfPositions.
+	auxCards := OrderedCollection new.
+	players do: [ :playerName | 2 timesRepeat: [auxCards add: (AssignatedCard from: playerName with: (aDeck takeACard))]].
+	^ self new initializeWith: aCircularBoard with: aDieHandle with: aDeck withLaps: aNumberOfLaps with: aSequence with: auxCards andWith: aBoardOfPositions.
 ]
 
 { #category : #actions }
@@ -33,8 +33,8 @@ RedGame >> accumulatePermanentEffectsOn: player [
 ]
 
 { #category : #actions }
-RedGame >> addMoveTo: aPlayerName [
-	moves add: (Move from: aPlayerName with: deck takeACard).
+RedGame >> addCardTo: aPlayerName [
+	assignatedCards add: (AssignatedCard from: aPlayerName with: deck takeACard).
 ]
 
 { #category : #actions }
@@ -44,7 +44,7 @@ RedGame >> addToPermanentMoves: aMove [
 
 { #category : #queries }
 RedGame >> amountOfMoves [
-	^ moves size.
+	^ assignatedCards size.
 ]
 
 { #category : #actions }
@@ -66,7 +66,7 @@ RedGame >> initializeWith: aCircularBoard with: aDieHandle with: aDeck withLaps:
 	playerSequence := aSequenceOfPlayers.
 	positionsBoard := aPositionsBoard.
 	permanentMoves := OrderedCollection new.
-	moves := auxMoves.
+	assignatedCards := auxMoves.
 ]
 
 { #category : #queries }
@@ -76,13 +76,12 @@ RedGame >> lapOf: playerName [
 
 { #category : #actions }
 RedGame >> play: aMove [
-	self validateMoveAndCardType: aMove.
-	moves
-		detect: [ :move | move source = aMove source and: [ move card class = aMove card class ] ]
-		ifFound: [ :move | moves remove: move ]
+	assignatedCards
+		detect: [ :assignatedCard | assignatedCard player = aMove source and: [ assignatedCard card equals: aMove card ] ]
+		ifFound: [ :assignatedCard | assignatedCards remove: assignatedCard ]
 		ifNone: [ self error: 'cant use a card thats not yours' ].
 	aMove activateEffect: self.
-	aMove card class = RedoCard
+	(aMove card equals: RedoCard new)
 		ifFalse: [ lastMove := aMove copy ]
 ]
 
@@ -140,21 +139,8 @@ RedGame >> useLastCardEffectWith: aMove [
 	lastMove ifNil: [ self error: 'Cant use a Redo Card without previews moves' ].
 	newCard := lastMove card copy.
 	newMove := aMove changeCard: newCard.
-	moves add: newMove.
+	assignatedCards add: (AssignatedCard from: newMove source with: newMove card).
 	self play: newMove.
-]
-
-{ #category : #actions }
-RedGame >> validateMoveAndCardType: aMove [
-	| checkTargetMove checkAccelerationMove  checkRedoMove|
-	checkTargetMove := aMove class = TargetMove.
-	checkAccelerationMove := aMove card class = AccelerationCard.
-	checkRedoMove := aMove card class = RedoCard.
-	(checkTargetMove and: [ checkAccelerationMove  ])
-		ifTrue: [ self error: 'cant play an AccelerationCard with a target' ].
-	(checkTargetMove not and: [ checkAccelerationMove  not and: [checkRedoMove not] ])
-		ifTrue: [ self
-				error: 'cant play an ' , aMove card className , ' without a target' ]
 ]
 
 { #category : #queries }
