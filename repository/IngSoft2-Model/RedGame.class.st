@@ -85,19 +85,6 @@ RedGame >> play: aMove [
 		ifFalse: [ lastMove := aMove copy ]
 ]
 
-{ #category : #actions }
-RedGame >> playATurnWithoutMoves [
-	| player |
-	(self hasEnded) ifTrue: [ self error: 'the game has ended' ].
-	player := playerSequence whosNext.
-	board with: self move: player with: (self rollDice).
-]
-
-{ #category : #actions }
-RedGame >> playWithoutMoves [
-	[ self hasEnded ] whileFalse: [ self playATurnWithoutMoves ].
-]
-
 { #category : #queries }
 RedGame >> positionOf: nameOfPlayer [
 	^ board positionOf: nameOfPlayer.

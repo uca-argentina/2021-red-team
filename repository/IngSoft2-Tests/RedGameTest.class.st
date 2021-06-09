@@ -36,6 +36,20 @@ RedGameTest >> effectsDistribution [
 ]
 
 { #category : #tests }
+RedGameTest >> playATurnWithoutMoves: game [
+	| player |
+	(game hasEnded) ifTrue: [ self error: 'the game has ended' ].
+	player := game whosTurnIsIt.
+	game rollDiceFor: player.
+	game finishTurn.
+]
+
+{ #category : #actions }
+RedGameTest >> playWithoutMoves: game [
+	[ game hasEnded ] whileFalse: [ self playATurnWithoutMoves: game ].
+]
+
+{ #category : #tests }
 RedGameTest >> randomDeck [
 	| deck  |
 	cardsDistribution := OrderedCollection new.
@@ -336,7 +350,7 @@ RedGameTest >> testAskInWhichLapIsThePlayer [
 		with: deck
 		withLaps: 3
 		andWith: players.
-	4 timesRepeat: [ aGame playATurnWithoutMoves ].
+	4 timesRepeat: [ self playATurnWithoutMoves: aGame ].
 	self assert: (aGame lapOf: 'martin') equals: 2.
 	self assert: (aGame lapOf: 'juan') equals: 1.
 	self assert: (aGame lapOf: 'roman') equals: 1
@@ -359,7 +373,7 @@ RedGameTest >> testAskRankingOfPlayerAfterTheGameEnded [
 		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame playWithoutMoves.
+	self playWithoutMoves: aGame..
 	self assert: (aGame rankingOf: 'martin') equals: 1.
 	self assert: (aGame rankingOf: 'juan') equals: 2.
 	self assert: (aGame rankingOf: 'roman') equals: 3
@@ -382,7 +396,7 @@ RedGameTest >> testAskRankingOfPlayerDuringTheGame [
 		with: deck
 		withLaps: 2
 		andWith: players.
-	4 timesRepeat: [ aGame playATurnWithoutMoves ].
+	4 timesRepeat: [ self playATurnWithoutMoves: aGame ].
 	self assert: (aGame rankingOf: 'martin') equals: 1.
 	self assert: (aGame rankingOf: 'juan') equals: 2.
 	self assert: (aGame rankingOf: 'roman') equals: 3.
@@ -405,7 +419,7 @@ RedGameTest >> testCannotAskWhoWonBeforeTheGameEnded [
 		with: deck
 		withLaps: 2
 		andWith: players.
-	4 timesRepeat: [ aGame playATurnWithoutMoves ].
+	4 timesRepeat: [ self playATurnWithoutMoves: aGame ].
 	self
 		should: [ aGame whoWon ]
 		raise: Error
@@ -615,9 +629,9 @@ RedGameTest >> testCannotPlayAfterTheGameHasEnded [
 		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame playWithoutMoves.
+	self playWithoutMoves: aGame.
 	self
-		should: [ aGame playATurnWithoutMoves ]
+		should: [ self playATurnWithoutMoves: aGame ]
 		raise: Error
 		withMessage: 'the game has ended'
 ]
@@ -639,7 +653,7 @@ RedGameTest >> testPlayAGameAndAskWhoWon [
 		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame playWithoutMoves.
+	self playWithoutMoves: aGame.
 	self assert: aGame whoWon equals: 'martin'
 ]
 
@@ -664,7 +678,7 @@ RedGameTest >> testPlayAGameWithARandomBoardAndRandomDice [
 		with: deck
 		withLaps: 3
 		andWith: players.
-	aGame playWithoutMoves.
+	self playWithoutMoves: aGame.
 	self assert: aGame hasEnded
 ]
 
@@ -685,8 +699,8 @@ RedGameTest >> testPlayAGameWithRegularCells [
 		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame playWithoutMoves.
-	self assert: aGame hasEnded
+	self playWithoutMoves: aGame.
+	self assert: aGame hasEnded.
 ]
 
 { #category : #tests }
@@ -707,10 +721,7 @@ RedGameTest >> testPlayATurnAndLandOnAMoonWalkCell [
 		with: deck
 		withLaps: 1
 		andWith: players.
-	aGame playATurnWithoutMoves;
-			playATurnWithoutMoves;
-			playATurnWithoutMoves;
-			playATurnWithoutMoves.
+	4 timesRepeat: [ self playATurnWithoutMoves: aGame ].
 	self assert: (aGame positionOf: 'martin') equals: 12.
 	self assert: (aGame positionOf: 'juan') equals: 2.
 	self assert: (aGame positionOf: 'roman') equals: 2.
@@ -733,7 +744,7 @@ RedGameTest >> testPlayATurnAndLandOnARegularCell [
 		with: deck
 		withLaps: 1
 		andWith: players.
-	aGame playATurnWithoutMoves.
+	self playATurnWithoutMoves: aGame.
 	self assert: (aGame positionOf: 'martin') equals: 6
 ]
 
@@ -755,7 +766,7 @@ RedGameTest >> testPlayATurnAndLandOnASpeedUpCell [
 		with: deck
 		withLaps: 2
 		andWith: players.
-	aGame playATurnWithoutMoves.
+	self playATurnWithoutMoves: aGame.
 	self assert: (aGame positionOf: 'martin') equals: 4
 ]
 
@@ -777,7 +788,7 @@ RedGameTest >> testPlayATurnAndLandOnAWormHoleCell [
 		with: deck
 		withLaps: 1
 		andWith: players.
-	aGame playATurnWithoutMoves.
+	self playATurnWithoutMoves: aGame.
 	self assert: (aGame positionOf: 'martin') equals: 2
 ]
 
@@ -797,7 +808,7 @@ RedGameTest >> testPlayATurnAndLandOnAnAtomicBombCell [
 		with: deck
 		withLaps: 1
 		andWith: players.
-	4 timesRepeat: [ aGame playATurnWithoutMoves ].
+	4 timesRepeat: [ self playATurnWithoutMoves: aGame ].
 	self assert: (aGame positionOf: 'martin') equals: 1.
 	self assert: (aGame positionOf: 'juan') equals: 1.
 	self assert: (aGame positionOf: 'roman') equals: 1
@@ -820,7 +831,7 @@ RedGameTest >> testPlayATurnAndLandOnAnAtomicBombCellAndStayOnCurrentLap [
 		with: deck
 		withLaps: 2
 		andWith: players.
-	4 timesRepeat: [ aGame playATurnWithoutMoves ].
+	4 timesRepeat: [ self playATurnWithoutMoves: aGame ].
 	self assert: (aGame positionOf: 'martin') equals: 1.
 	self assert: (aGame lapOf: 'martin') equals: 2.
 	self assert: (aGame positionOf: 'juan') equals: 1.
