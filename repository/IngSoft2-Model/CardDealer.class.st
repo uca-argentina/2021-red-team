@@ -11,10 +11,11 @@ Class {
 }
 
 { #category : #'instance creation' }
-CardDealer class >> with: players andWith: deck [ 
+CardDealer class >> with: players with: aNumberOfAssignatedCards andWith: deck [ 
 	| auxCards |
+	(aNumberOfAssignatedCards >= 0) ifFalse: [ self error: 'invalid number of initial cards' ].
 	auxCards := OrderedCollection new.
-	players do: [ :playerName | 2 timesRepeat: [auxCards add: (AssignatedCard from: playerName with: (deck takeACard))]].
+	players do: [ :playerName | aNumberOfAssignatedCards timesRepeat: [auxCards add: (AssignatedCard from: playerName with: (deck takeACard))]].
 	^ self new initializeWith: auxCards andWith: deck.
 ]
 

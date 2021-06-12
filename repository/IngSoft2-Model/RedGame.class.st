@@ -13,13 +13,13 @@ Class {
 }
 
 { #category : #'instance creation' }
-RedGame class >> with: aCircularBoard with: aDieHandle with: aDeck withLaps: aNumberOfLaps andWith: players [
+RedGame class >> with: aCircularBoard with: aDieHandle with: aDeck withLaps: aNumberOfLaps with: players andWith: aNumberOfAssignatedCards [
 	| aSequence aBoardOfPositions cardDealer|
 	players ifEmpty: [ self error: 'cannot create a RedGame without players' ].
 	(aNumberOfLaps > 0) ifFalse: [ self error: 'invalid number of laps' ].
 	aSequence := SequenceOfPlayers with: players.
 	aBoardOfPositions := PositionsBoard with: players.
-	cardDealer := CardDealer with: players andWith: aDeck.
+	cardDealer := CardDealer with: players with: aNumberOfAssignatedCards andWith: aDeck.
 	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence with: cardDealer andWith: aBoardOfPositions.
 ]
 
