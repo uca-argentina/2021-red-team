@@ -1,5 +1,5 @@
 Class {
-	#name : #CardsHandler,
+	#name : #CardDealer,
 	#superclass : #Object,
 	#instVars : [
 		'assignatedCards',
@@ -11,7 +11,7 @@ Class {
 }
 
 { #category : #'instance creation' }
-CardsHandler class >> with: players andWith: deck [ 
+CardDealer class >> with: players andWith: deck [ 
 	| auxCards |
 	auxCards := OrderedCollection new.
 	players do: [ :playerName | 2 timesRepeat: [auxCards add: (AssignatedCard from: playerName with: (deck takeACard))]].
@@ -19,53 +19,53 @@ CardsHandler class >> with: players andWith: deck [
 ]
 
 { #category : #initialize }
-CardsHandler >> accumulatePermanentEffectsOn: player [
+CardDealer >> accumulatePermanentEffectsOn: player [
 	^ permanentMoves ifEmpty: [ 0 ] ifNotEmpty: [permanentMoves sum: [ :move | move effectOn: player]].
 ]
 
 { #category : #initialize }
-CardsHandler >> addCardTo: aPlayerName [
+CardDealer >> addCardTo: aPlayerName [
 	assignatedCards add: (AssignatedCard from: aPlayerName with: deck takeACard).
 ]
 
 { #category : #initialize }
-CardsHandler >> addToPermanentMoves: aMove [
+CardDealer >> addToPermanentMoves: aMove [
 	permanentMoves add: aMove copy.
 ]
 
 { #category : #initialize }
-CardsHandler >> amountOfMoves [
+CardDealer >> amountOfMoves [
 	^ assignatedCards size.
 ]
 
 { #category : #initialize }
-CardsHandler >> handle: aMove with: aGame [
+CardDealer >> handle: aMove with: aGame [
 	self verifyIfCardIsAssignated: aMove.
 	aMove activateEffect: aGame.
 	self updateLastMove: aMove
 ]
 
 { #category : #initialize }
-CardsHandler >> initializeWith: auxAssignatedCards andWith: aDeck [
+CardDealer >> initializeWith: auxAssignatedCards andWith: aDeck [
 	assignatedCards := auxAssignatedCards.
 	deck := aDeck.
 	permanentMoves := OrderedCollection new.
 ]
 
 { #category : #initialize }
-CardsHandler >> removePermanentMove: aMove [ 
+CardDealer >> removePermanentMove: aMove [ 
 	permanentMoves ifEmpty: [ self error: 'there are no permanent cards' ].
 	permanentMoves := permanentMoves reject: [ :move | move equalsMove: aMove ].
 ]
 
 { #category : #initialize }
-CardsHandler >> updateLastMove: aMove [
+CardDealer >> updateLastMove: aMove [
 	(aMove card equals: RedoCard new)
 		ifFalse: [ lastMove := aMove copy ]
 ]
 
 { #category : #initialize }
-CardsHandler >> useLastCardEffectWith: aMove andWith: aGame [
+CardDealer >> useLastCardEffectWith: aMove andWith: aGame [
 	| newCard newMove |
 	lastMove ifNil: [ self error: 'Cant use a Redo Card without previews moves' ].
 	newCard := lastMove card copy.
@@ -75,7 +75,7 @@ CardsHandler >> useLastCardEffectWith: aMove andWith: aGame [
 ]
 
 { #category : #initialize }
-CardsHandler >> verifyIfCardIsAssignated: aMove [
+CardDealer >> verifyIfCardIsAssignated: aMove [
 	assignatedCards
 		detect: [ :assignatedCard | 
 			assignatedCard player = aMove source

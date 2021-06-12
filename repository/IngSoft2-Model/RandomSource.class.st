@@ -25,7 +25,7 @@ RandomSource >> initializeWith: eventsDistribution [
 				withOccurrences: (probabilityEvent probability * 100) asInteger ].
 ]
 
-{ #category : #action }
+{ #category : #actions }
 RandomSource >> produce: size [
 	| collection |
 	collection := OrderedCollection new.

@@ -49,6 +49,16 @@ RedGameTest >> playWithoutMoves: game [
 ]
 
 { #category : #tests }
+RedGameTest >> randomBoardWith: players andWith: numberOfCells [
+	| effectSource randomCells effectsDistribution aCircularBoard |
+	effectsDistribution := self effectsDistribution.
+	effectSource := RandomSource basedOn: effectsDistribution.
+	randomCells := effectSource produce: numberOfCells.
+	aCircularBoard := CircularBoard with: players andWithAll: randomCells.
+	^ aCircularBoard
+]
+
+{ #category : #tests }
 RedGameTest >> randomDeck [
 	| deck  |
 	cardsDistribution := OrderedCollection new.
@@ -636,6 +646,32 @@ RedGameTest >> testCannotPlayAfterTheGameHasEnded [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotUseACardAfterTheGameHasEnded [
+	| aCircularBoard aDieHandle players aGame fifteenCells deck move |
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan' 'roman').
+	fifteenCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenCells.
+	cardsDistribution := OrderedCollection new.
+	deck := self randomDeck .
+	aGame := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 2
+		andWith: players.
+	self playWithoutMoves: aGame.
+	move := Move from: 'martin' with: AccelerationCard new.
+	self
+		should: [ aGame play: move]
+		raise: Error
+		withMessage: 'the game has ended'
+]
+
+{ #category : #tests }
 RedGameTest >> testPlayAGameAndAskWhoWon [
 	| aCircularBoard aDieHandle players aGame fifteenRegularCells deck |
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
@@ -658,7 +694,7 @@ RedGameTest >> testPlayAGameAndAskWhoWon [
 
 { #category : #tests }
 RedGameTest >> testPlayAGameWithARandomBoardAndRandomDice [
-	| aCircularBoard dice aDieHandle players aGame randomCells die1 die2 die3 effectsDistribution effectSource numberOfCells deck |
+	| aCircularBoard dice aDieHandle players aGame die1 die2 die3 numberOfCells deck |
 	die1 := RandomDie with: 10.
 	die2 := RandomDie with: 8.
 	die3 := RandomDie with: 6.
@@ -666,10 +702,9 @@ RedGameTest >> testPlayAGameWithARandomBoardAndRandomDice [
 	aDieHandle := DieHandle with: dice.
 	players := #('martin' 'juan' 'roman').
 	numberOfCells := 50.
-	effectsDistribution := self effectsDistribution.
-	effectSource := RandomSource basedOn: effectsDistribution.
-	randomCells := effectSource produce: numberOfCells.
-	aCircularBoard := CircularBoard with: players andWithAll: randomCells.
+	aCircularBoard := self
+		randomBoardWith: players
+		andWith: numberOfCells.
 	deck := self randomDeck.
 	aGame := RedGame
 		with: aCircularBoard
@@ -700,6 +735,31 @@ RedGameTest >> testPlayAGameWithRegularCells [
 		andWith: players.
 	self playWithoutMoves: aGame.
 	self assert: aGame hasEnded.
+]
+
+{ #category : #tests }
+RedGameTest >> testPlayARepeatCardHasNoEffectBeforeAnyoneRollsTheDice [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: RepeatCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		andWith: players.
+	move := TargetMove from: 'juan' with: RepeatCard new against: 'juan'.
+	game play: move.
+	self assert: (game positionOf: 'juan') equals: 0.
 ]
 
 { #category : #tests }

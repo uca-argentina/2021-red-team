@@ -7,30 +7,30 @@ Class {
 		'laps',
 		'playerSequence',
 		'positionsBoard',
-		'cardsHandler'
+		'cardDealer'
 	],
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #'instance creation' }
 RedGame class >> with: aCircularBoard with: aDieHandle with: aDeck withLaps: aNumberOfLaps andWith: players [
-	| aSequence aBoardOfPositions cardsHandler|
+	| aSequence aBoardOfPositions cardDealer|
 	players ifEmpty: [ self error: 'cannot create a RedGame without players' ].
 	(aNumberOfLaps > 0) ifFalse: [ self error: 'invalid number of laps' ].
 	aSequence := SequenceOfPlayers with: players.
 	aBoardOfPositions := PositionsBoard with: players.
-	cardsHandler := CardsHandler with: players andWith: aDeck.
-	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence with: cardsHandler andWith: aBoardOfPositions.
+	cardDealer := CardDealer with: players andWith: aDeck.
+	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence with: cardDealer andWith: aBoardOfPositions.
 ]
 
 { #category : #actions }
 RedGame >> addToPermanentMoves: aMove [
-	cardsHandler addToPermanentMoves: aMove.
+	cardDealer addToPermanentMoves: aMove.
 ]
 
 { #category : #queries }
 RedGame >> amountOfMoves [
-	^ cardsHandler amountOfMoves.
+	^ cardDealer amountOfMoves.
 ]
 
 { #category : #actions }
@@ -44,13 +44,13 @@ RedGame >> hasEnded [
 ]
 
 { #category : #initialize }
-RedGame >> initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequenceOfPlayers with: aCardsHandler andWith: aPositionsBoard [ 
+RedGame >> initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequenceOfPlayers with: aCardDealer andWith: aPositionsBoard [ 
 	dieHandle := aDieHandle.
 	board := aCircularBoard.
 	laps := aNumberOfLaps.
 	playerSequence := aSequenceOfPlayers.
 	positionsBoard := aPositionsBoard.
-	cardsHandler := aCardsHandler.
+	cardDealer := aCardDealer.
 ]
 
 { #category : #queries }
@@ -60,7 +60,8 @@ RedGame >> lapOf: playerName [
 
 { #category : #actions }
 RedGame >> play: aMove [
-	cardsHandler handle: aMove with: self.
+	self verifyIfGameHasEnded.
+	cardDealer handle: aMove with: self.
 ]
 
 { #category : #queries }
@@ -75,26 +76,37 @@ RedGame >> rankingOf: name [
 
 { #category : #actions }
 RedGame >> removePermanentMove: aMove [ 
-	cardsHandler removePermanentMove: aMove.
+	cardDealer removePermanentMove: aMove.
 ]
 
 { #category : #actions }
 RedGame >> rollDiceFor: playerName [
 	| permanentCardsResult |
-	(self hasEnded) ifTrue: [ self error: 'the game has ended' ].
-	(playerName = playerSequence whosTurnIsIt) ifFalse: [ self error: 'cant play on anothers turn' ].
-	permanentCardsResult := cardsHandler accumulatePermanentEffectsOn: playerName.
-	board with: cardsHandler move: playerName with: (dieHandle roll + permanentCardsResult).
+	self verifyIfGameHasEnded.
+	playerName = playerSequence whosTurnIsIt
+		ifFalse: [ self error: 'cant play on anothers turn' ].
+	permanentCardsResult := cardDealer
+		accumulatePermanentEffectsOn: playerName.
+	board
+		with: cardDealer
+		move: playerName
+		with: dieHandle roll + permanentCardsResult
 ]
 
-{ #category : #action }
+{ #category : #actions }
 RedGame >> useLastBoardEffectOn: playerName [
 	board repeatLastEffectOn: playerName with: self.
 ]
 
 { #category : #actions }
 RedGame >> useLastCardEffectWith: aMove [ 
-	cardsHandler useLastCardEffectWith: aMove andWith: self. 
+	cardDealer useLastCardEffectWith: aMove andWith: self. 
+]
+
+{ #category : #actions }
+RedGame >> verifyIfGameHasEnded [
+	self hasEnded
+		ifTrue: [ self error: 'the game has ended' ]
 ]
 
 { #category : #queries }

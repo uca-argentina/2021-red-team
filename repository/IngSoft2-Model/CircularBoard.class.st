@@ -28,6 +28,7 @@ CircularBoard >> anyPlayerFinished: laps [
 CircularBoard >> initializeWith: positions andWithAll: collectionOfCells [
 	cells := collectionOfCells.
 	positionsBoard := positions.
+	lastCell := RegularCell new.
 	
 ]
 
