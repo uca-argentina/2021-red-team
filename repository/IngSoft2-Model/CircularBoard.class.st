@@ -85,11 +85,11 @@ CircularBoard >> whoWon [
 ]
 
 { #category : #actions }
-CircularBoard >> with: game move: player with: rollValue [
+CircularBoard >> with: cardsHandler move: player with: rollValue [
 	| currentPosition currentCell |
 	positionsBoard updatePositionOf: player with: rollValue.
 	currentPosition := self positionOnLap: player.
 	currentCell := cells at: currentPosition.
 	lastCell := currentCell .
-	currentCell activateEffect: self from: player with: game.
+	currentCell activateEffect: self from: player with: cardsHandler.
 ]

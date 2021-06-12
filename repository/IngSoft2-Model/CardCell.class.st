@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #actions }
-CardCell >> activateEffect: board from: aPlayerName with: game [ 
-	game addCardTo: aPlayerName.
+CardCell >> activateEffect: board from: aPlayerName with: cardsHandler [
+	cardsHandler addCardTo: aPlayerName.
 ]

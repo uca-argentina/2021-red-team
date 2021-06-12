@@ -38,7 +38,6 @@ RedGameTest >> effectsDistribution [
 { #category : #tests }
 RedGameTest >> playATurnWithoutMoves: game [
 	| player |
-	(game hasEnded) ifTrue: [ self error: 'the game has ended' ].
 	player := game whosTurnIsIt.
 	game rollDiceFor: player.
 	game finishTurn.

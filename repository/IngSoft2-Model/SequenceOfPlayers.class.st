@@ -26,14 +26,6 @@ SequenceOfPlayers >> initializeWith: players [
 ]
 
 { #category : #queries }
-SequenceOfPlayers >> whosNext [
-	| currentPlayer |
-	currentPlayer := orderOfPlayers removeFirst.
-	orderOfPlayers addLast: currentPlayer.
-	^ currentPlayer.
-]
-
-{ #category : #queries }
 SequenceOfPlayers >> whosTurnIsIt [
 	^ orderOfPlayers first.
 ]
