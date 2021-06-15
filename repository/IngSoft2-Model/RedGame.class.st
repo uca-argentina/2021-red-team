@@ -6,7 +6,6 @@ Class {
 		'board',
 		'laps',
 		'playerSequence',
-		'positionsBoard',
 		'cardDealer'
 	],
 	#category : #'IngSoft2-Model'
@@ -14,13 +13,12 @@ Class {
 
 { #category : #'instance creation' }
 RedGame class >> with: aCircularBoard with: aDieHandle with: aDeck withLaps: aNumberOfLaps with: players andWith: aNumberOfAssignatedCards [
-	| aSequence aBoardOfPositions cardDealer|
+	| aSequence cardDealer|
 	players ifEmpty: [ self error: 'cannot create a RedGame without players' ].
 	(aNumberOfLaps > 0) ifFalse: [ self error: 'invalid number of laps' ].
 	aSequence := SequenceOfPlayers with: players.
-	aBoardOfPositions := PositionsBoard with: players.
 	cardDealer := CardDealer with: players with: aNumberOfAssignatedCards andWith: aDeck.
-	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence with: cardDealer andWith: aBoardOfPositions.
+	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence andWith: cardDealer.
 ]
 
 { #category : #actions }
@@ -44,12 +42,11 @@ RedGame >> hasEnded [
 ]
 
 { #category : #initialize }
-RedGame >> initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequenceOfPlayers with: aCardDealer andWith: aPositionsBoard [ 
+RedGame >> initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequenceOfPlayers andWith: aCardDealer [
 	dieHandle := aDieHandle.
 	board := aCircularBoard.
 	laps := aNumberOfLaps.
 	playerSequence := aSequenceOfPlayers.
-	positionsBoard := aPositionsBoard.
 	cardDealer := aCardDealer.
 ]
 
