@@ -56,6 +56,7 @@ CardDealer >> initializeWith: auxAssignatedCards andWith: aDeck [
 { #category : #initialize }
 CardDealer >> removePermanentMove: aMove [ 
 	permanentMoves ifEmpty: [ self error: 'there are no permanent cards' ].
+	(permanentMoves anySatisfy: [ :move | move equalsMove: aMove ]) ifFalse: [self error: 'Cant cancel a card that wasnt played' ].
 	permanentMoves := permanentMoves reject: [ :move | move equalsMove: aMove ].
 ]
 

@@ -10,7 +10,10 @@ Class {
 
 { #category : #'instance creation' }
 RandomSource class >> basedOn: eventsDistribution [
+	| probability |
 	eventsDistribution ifEmpty: [ self error: 'cant create a RandomSource without a events distribution' ].
+	probability := eventsDistribution sum: [ :event | event probability].
+	(probability < 0.99 or: [probability > 1.01]) ifTrue: [ self error: 'The sum of all events probabilities must sum 1' ].
 	^self new initializeWith: eventsDistribution .
 ]
 
@@ -28,6 +31,7 @@ RandomSource >> initializeWith: eventsDistribution [
 { #category : #actions }
 RandomSource >> produce: size [
 	| collection |
+	(size < 1) ifTrue: [ self error: 'Cant produce an invalid number of items' ].
 	collection := OrderedCollection new.
 	size timesRepeat: [ collection add: (pool atRandom: randomness) copy  ].
 	^collection.

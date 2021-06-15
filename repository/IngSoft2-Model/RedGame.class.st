@@ -83,8 +83,8 @@ RedGame >> removePermanentMove: aMove [
 RedGame >> rollDiceFor: playerName [
 	| permanentCardsResult |
 	self verifyIfGameHasEnded.
-	playerName = playerSequence whosTurnIsIt
-		ifFalse: [ self error: 'cant play on anothers turn' ].
+	self verifyIfItsPlaying: playerName.
+	self verifyCorrespondentTurn: playerName.
 	permanentCardsResult := cardDealer
 		accumulatePermanentEffectsOn: playerName.
 	board
@@ -104,9 +104,21 @@ RedGame >> useLastCardEffectWith: aMove [
 ]
 
 { #category : #actions }
+RedGame >> verifyCorrespondentTurn: playerName [
+	playerName = playerSequence whosTurnIsIt
+		ifFalse: [ self error: 'cant play on anothers turn' ]
+]
+
+{ #category : #actions }
 RedGame >> verifyIfGameHasEnded [
 	self hasEnded
 		ifTrue: [ self error: 'the game has ended' ]
+]
+
+{ #category : #actions }
+RedGame >> verifyIfItsPlaying: playerName [
+	(playerSequence verifyIfItsPlaying: playerName)
+		ifFalse: [ self error: 'Cannot roll for a player that is not playing' ]
 ]
 
 { #category : #queries }

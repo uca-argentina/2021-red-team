@@ -245,6 +245,7 @@ RedGameTest >> testARepeatMove [
 	game finishTurn.
 	self assert: (game positionOf: 'juan') equals: 10.
 	self assert: (game positionOf: 'martin') equals: 10
+	
 ]
 
 { #category : #tests }
@@ -432,6 +433,39 @@ RedGameTest >> testAskRankingOfPlayerDuringTheGame [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotAskARandomSourceToProduceAnInvalidNumberOfItems [
+	| randomSource |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: AccelerationCard new with: 1).
+	randomSource := RandomSource basedOn: cardsDistribution.
+	self should: [ randomSource produce: -1 ] raise: Error withMessage: 'Cant produce an invalid number of items'.
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotAskPositionOfAnInvalidPlayer [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck amountOfInitialCards |
+	deck := self randomDeck.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	self should: [game positionOf: 'Juan Roman Riquelme'] raise: Error withMessage: 'That player is not in the game'.
+]
+
+{ #category : #tests }
 RedGameTest >> testCannotAskWhoWonBeforeTheGameEnded [
 	| aCircularBoard aDieHandle players aGame fifteenRegularCells deck amountOfInitialCards |
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
@@ -455,6 +489,54 @@ RedGameTest >> testCannotAskWhoWonBeforeTheGameEnded [
 		should: [ aGame whoWon ]
 		raise: Error
 		withMessage: 'the game is still running'
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotCancelACardThatHasntBeenPlayed [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards cards objectiveMove |
+	cards := OrderedCollection new.
+	cards
+		add: SpeedCard new;
+		add: RepeatCard new;
+		add: OverloadCard new;
+		add: CancellationCard new.
+	deck := LoadedDeck with: cards.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	move := TargetMove
+		from: 'martin'
+		with: SpeedCard new
+		against: 'martin'.
+	game play: move.
+	game finishTurn.
+	game rollDiceFor: 'juan'.
+	objectiveMove := TargetMove
+		from: 'martin'
+		with: OverloadCard new
+		against: 'juan'.
+	move := TargetMove
+		from: 'juan'
+		with: CancellationCard new
+		against: objectiveMove.
+	
+	self
+		should: [ game play: move ]
+		raise: Error
+		withMessage: 'Cant cancel a card that wasnt played'.
 ]
 
 { #category : #tests }
@@ -496,6 +578,12 @@ RedGameTest >> testCannotCreateADieWithLessThanFourFaces [
 		should: [ RandomDie with: 3 ]
 		raise: Error
 		withMessage: 'invalid number of faces'
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotCreateADiscreteProbabilityEventWithAnInvalidProbability [
+	self should: [DiscreteProbabilityEvent of: AccelerationCard new with: 2] raise: Error withMessage: 'Cant create a DiscreteProbabilityEvent with an invalid probabilty'.
+	self should: [DiscreteProbabilityEvent of: AccelerationCard new with: -1] raise: Error withMessage: 'Cant create a DiscreteProbabilityEvent with an invalid probabilty'.
 ]
 
 { #category : #tests }
@@ -574,6 +662,11 @@ RedGameTest >> testCannotCreateAGameWithoutPlayers [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotCreateALoadedDeckWithoutCards [
+	self should: [LoadedDeck with: OrderedCollection new] raise: Error withMessage: 'Cannot create a LoadedDeck without cards'.
+]
+
+{ #category : #tests }
 RedGameTest >> testCannotCreateAPositionWithoutName [
 	self
 		should: [ Position from: '' ]
@@ -582,11 +675,52 @@ RedGameTest >> testCannotCreateAPositionWithoutName [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotCreateARandomSourceWithEventsProbabilitiesWhichDontSum1 [
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: RepeatCard new with: 0.6);
+		add: (DiscreteProbabilityEvent of: AccelerationCard new with: 0.6).
+	self should: [Deck with: (RandomSource basedOn: cardsDistribution)] raise: Error withMessage: 'The sum of all events probabilities must sum 1'.
+	
+]
+
+{ #category : #tests }
 RedGameTest >> testCannotCreateARandomSourceWithoutAEventsDistribution [
 	self
 		should: [ RandomSource basedOn: OrderedCollection new ]
 		raise: Error
 		withMessage: 'cant create a RandomSource without a events distribution'.
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotPlayACardYouDontHave [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: OverloadCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	move := Move
+		from: 'martin'
+		with: AccelerationCard new.
+	self
+		should: [ game play: move ]
+		raise: Error
+		withMessage: 'cant use a card thats not yours'
 ]
 
 { #category : #tests }
@@ -616,6 +750,38 @@ RedGameTest >> testCannotPlayAMoveWithTargetedCard [
 		should: [ Move from: 'martin' with: OverloadCard new ]
 		raise: Error
 		withMessage: 'Cant create a move for OverloadCard without target'
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotPlayAPermanentCardWhenItsNotYourTurn [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: OverloadCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	move := TargetMove
+		from: 'juan'
+		with: OverloadCard new
+		against: 'martin'.
+	self
+		should: [ game play: move ]
+		raise: Error
+		withMessage: 'cant use a permanent card on anothers turn'
 ]
 
 { #category : #tests }
@@ -707,6 +873,28 @@ RedGameTest >> testCannotPlayAfterTheGameHasEnded [
 		should: [ self playATurnWithoutMoves: aGame ]
 		raise: Error
 		withMessage: 'the game has ended'
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotRollDiceForAnInvalidPlayer [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck amountOfInitialCards |
+	deck := self randomDeck.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	self should: [game rollDiceFor: 'Juan Roman Riquelme'] raise: Error withMessage: 'Cannot roll for a player that is not playing'.
 ]
 
 { #category : #tests }
@@ -977,6 +1165,39 @@ RedGameTest >> testPlayATurnAndLandOnAnAtomicBombCellAndStayOnCurrentLap [
 	self assert: (aGame lapOf: 'juan') equals: 1.
 	self assert: (aGame positionOf: 'roman') equals: 1.
 	self assert: (aGame lapOf: 'roman') equals: 1
+]
+
+{ #category : #tests }
+RedGameTest >> testPlayAnInstantCardWhenItsNotYourTurn [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: RepeatCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 5 to: fifteenRegularCells.
+	self add: SpeedUpCell new times: 1 to: fifteenRegularCells.
+	self add: RegularCell new times: 9 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	move := TargetMove from: 'juan' with: RepeatCard new against: 'juan'.
+	game play: move.
+	game finishTurn.
+
+	self assert: (game positionOf: 'juan') equals: 4.
+	self assert: (game positionOf: 'martin') equals: 10.
 ]
 
 { #category : #tests }

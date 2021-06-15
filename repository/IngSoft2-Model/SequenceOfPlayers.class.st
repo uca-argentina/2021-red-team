@@ -25,6 +25,11 @@ SequenceOfPlayers >> initializeWith: players [
 	orderOfPlayers := players asOrderedCollection.
 ]
 
+{ #category : #actions }
+SequenceOfPlayers >> verifyIfItsPlaying: aPlayerName [
+	^ orderOfPlayers includes: aPlayerName. 
+]
+
 { #category : #queries }
 SequenceOfPlayers >> whosTurnIsIt [
 	^ orderOfPlayers first.

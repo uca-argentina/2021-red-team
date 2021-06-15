@@ -10,6 +10,7 @@ Class {
 
 { #category : #'instance creation' }
 DiscreteProbabilityEvent class >> of: anEvent with: aProbability [
+	(aProbability < 0 or: [aProbability > 1]) ifTrue: [ self error: 'Cant create a DiscreteProbabilityEvent with an invalid probabilty' ].
 	^self new initializeWith: anEvent andWith: aProbability.
 ]
 

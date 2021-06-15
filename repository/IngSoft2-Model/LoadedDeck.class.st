@@ -9,6 +9,7 @@ Class {
 
 { #category : #'instance creation' }
 LoadedDeck class >> with: cards [
+	cards ifEmpty: [ self error: 'Cannot create a LoadedDeck without cards' ].
 	^ self new intializeWith: cards .
 ]
 
