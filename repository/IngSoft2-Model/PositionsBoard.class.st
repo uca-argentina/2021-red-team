@@ -19,6 +19,13 @@ PositionsBoard >> anyPlayerFinished: laps withBoardOfSize: cells [
 ]
 
 { #category : #queries }
+PositionsBoard >> arePlaying: players [
+	| playersInBoard |
+	playersInBoard := positions collect: [ :aPosition | aPosition nameOfPlayer].
+	^ players asOrderedCollection = playersInBoard 
+]
+
+{ #category : #queries }
 PositionsBoard >> findPositionOf: name in: collection [
 	^ collection detect: [ :position | position nameOfPlayer = name ] ifNone: [ self error: 'That player is not in the game' ].
 ]

@@ -35,11 +35,6 @@ CardDealer >> addToPermanentMoves: aMove [
 ]
 
 { #category : #initialize }
-CardDealer >> amountOfMoves [
-	^ assignatedCards size.
-]
-
-{ #category : #initialize }
 CardDealer >> handle: aMove with: aGame [
 	self verifyIfCardIsAssignated: aMove.
 	aMove activateEffect: aGame.
@@ -54,9 +49,9 @@ CardDealer >> initializeWith: auxAssignatedCards andWith: aDeck [
 ]
 
 { #category : #initialize }
-CardDealer >> removePermanentMove: aMove [ 
+CardDealer >> removePermanentMove: aMove [
 	permanentMoves ifEmpty: [ self error: 'there are no permanent cards' ].
-	(permanentMoves anySatisfy: [ :move | move equalsMove: aMove ]) ifFalse: [self error: 'Cant cancel a card that wasnt played' ].
+	(permanentMoves anySatisfy: [ :move | move equalsMove: aMove ]) ifFalse: [ self error: 'Cant cancel a card that wasnt played' ].
 	permanentMoves := permanentMoves reject: [ :move | move equalsMove: aMove ].
 ]
 

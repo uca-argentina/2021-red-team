@@ -24,6 +24,11 @@ CircularBoard >> anyPlayerFinished: laps [
 	^ positionsBoard anyPlayerFinished: laps withBoardOfSize: cells size.
 ]
 
+{ #category : #queries }
+CircularBoard >> arePlaying: players [ 
+	^positionsBoard arePlaying: players.
+]
+
 { #category : #initialize }
 CircularBoard >> initializeWith: positions andWithAll: collectionOfCells [
 	cells := collectionOfCells.

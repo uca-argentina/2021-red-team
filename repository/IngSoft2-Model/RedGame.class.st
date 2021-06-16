@@ -16,6 +16,7 @@ RedGame class >> with: aCircularBoard with: aDieHandle with: aDeck withLaps: aNu
 	| aSequence cardDealer|
 	players ifEmpty: [ self error: 'cannot create a RedGame without players' ].
 	(aNumberOfLaps > 0) ifFalse: [ self error: 'invalid number of laps' ].
+	(aCircularBoard arePlaying: players) ifFalse: [ self error: 'game and board must have the same players' ].
 	aSequence := SequenceOfPlayers with: players.
 	cardDealer := CardDealer with: players with: aNumberOfAssignatedCards andWith: aDeck.
 	^ self new initializeWith: aCircularBoard with: aDieHandle withLaps: aNumberOfLaps with: aSequence andWith: cardDealer.
@@ -24,11 +25,6 @@ RedGame class >> with: aCircularBoard with: aDieHandle with: aDeck withLaps: aNu
 { #category : #actions }
 RedGame >> addToPermanentMoves: aMove [
 	cardDealer addToPermanentMoves: aMove.
-]
-
-{ #category : #queries }
-RedGame >> amountOfMoves [
-	^ cardDealer amountOfMoves.
 ]
 
 { #category : #actions }
@@ -120,7 +116,8 @@ RedGame >> verifyIfItsPlaying: playerName [
 
 { #category : #queries }
 RedGame >> whoWon [
-	(self hasEnded) ifFalse: [ self error: 'the game is still running' ].
+	self hasEnded
+		ifFalse: [ self error: 'the game is still running' ].
 	^board whoWon.
 ]
 

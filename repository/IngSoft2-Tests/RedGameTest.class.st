@@ -140,8 +140,11 @@ RedGameTest >> testACancellationMove [
 
 { #category : #tests }
 RedGameTest >> testACardCell [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck amountOfInitialCards |
-	deck := self randomDeck.
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck amountOfInitialCards move |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: SpeedCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
 	players := #('martin' 'juan').
 	fifteenRegularCells := OrderedCollection new.
@@ -151,7 +154,7 @@ RedGameTest >> testACardCell [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenRegularCells.
-	amountOfInitialCards := 2.
+	amountOfInitialCards := 0.
 	game := RedGame
 		with: aCircularBoard
 		with: aDieHandle
@@ -161,7 +164,16 @@ RedGameTest >> testACardCell [
 		andWith: amountOfInitialCards.
 	game rollDiceFor: 'martin'.
 	game finishTurn.
-	self assert: game amountOfMoves equals: 5
+	game rollDiceFor: 'juan'.
+	game finishTurn.
+	move := TargetMove
+		from: 'martin'
+		with: SpeedCard new
+		against: 'martin'.
+	game play: move.
+	game rollDiceFor: 'martin'.
+	game finishTurn.
+	self assert: (game positionOf: 'martin') equals: 13.
 ]
 
 { #category : #tests }
@@ -210,6 +222,55 @@ RedGameTest >> testARedoMove [
 	game rollDiceFor: 'juan'.
 	game finishTurn.
 	self assert: (game positionOf: 'juan') equals: 10.
+	self assert: (game positionOf: 'martin') equals: 13
+]
+
+{ #category : #tests }
+RedGameTest >> testARedoMoveAfterARedoMoveReusesTheSameCard [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards amountOfInitialCards |
+	cards := OrderedCollection new.
+	cards
+		add: RedoCard new;
+		add: OverloadCard new;
+		add: SpeedCard new;
+		add: RedoCard new.
+	deck := LoadedDeck with: cards.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	game finishTurn.
+	move := TargetMove from: 'juan' with: SpeedCard new against: 'juan'.
+	game play: move.
+	game rollDiceFor: 'juan'.
+	game finishTurn.
+	move := TargetMove
+		from: 'martin'
+		with: RedoCard new
+		against: 'martin'.
+	game play: move.
+	game rollDiceFor: 'martin'.
+	game finishTurn.
+	move := TargetMove
+		from: 'juan'
+		with: RedoCard new
+		against: 'juan'.
+	game play: move.
+	game rollDiceFor: 'juan'.
+	game finishTurn.
+	self assert: (game positionOf: 'juan') equals: 15.
 	self assert: (game positionOf: 'martin') equals: 13
 ]
 
@@ -492,6 +553,49 @@ RedGameTest >> testCannotAskWhoWonBeforeTheGameEnded [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotCancelACardIfNoPermanentCardsAreActive [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards cards objectiveMove |
+	cards := OrderedCollection new.
+	cards
+		add: SpeedCard new;
+		add: RepeatCard new;
+		add: OverloadCard new;
+		add: CancellationCard new.
+	deck := LoadedDeck with: cards.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	game finishTurn.
+	game rollDiceFor: 'juan'.
+	objectiveMove := TargetMove
+		from: 'martin'
+		with: OverloadCard new
+		against: 'juan'.
+	move := TargetMove
+		from: 'juan'
+		with: CancellationCard new
+		against: objectiveMove.
+	
+	self
+		should: [ game play: move ]
+		raise: Error
+		withMessage: 'there are no permanent cards'.
+]
+
+{ #category : #tests }
 RedGameTest >> testCannotCancelACardThatHasntBeenPlayed [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards cards objectiveMove |
 	cards := OrderedCollection new.
@@ -573,9 +677,9 @@ RedGameTest >> testCannotCreateADieHandleWithoutDice [
 ]
 
 { #category : #tests }
-RedGameTest >> testCannotCreateADieWithLessThanFourFaces [
+RedGameTest >> testCannotCreateADieWithLessThanThreeFaces [
 	self
-		should: [ RandomDie with: 3 ]
+		should: [ RandomDie with: 2 ]
 		raise: Error
 		withMessage: 'invalid number of faces'
 ]
@@ -584,6 +688,31 @@ RedGameTest >> testCannotCreateADieWithLessThanFourFaces [
 RedGameTest >> testCannotCreateADiscreteProbabilityEventWithAnInvalidProbability [
 	self should: [DiscreteProbabilityEvent of: AccelerationCard new with: 2] raise: Error withMessage: 'Cant create a DiscreteProbabilityEvent with an invalid probabilty'.
 	self should: [DiscreteProbabilityEvent of: AccelerationCard new with: -1] raise: Error withMessage: 'Cant create a DiscreteProbabilityEvent with an invalid probabilty'.
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotCreateAGameWithDiffetenPlayersThanBoard [
+	| aCircularBoard aDieHandle fifteenCells deck amountOfInitialCards playersBoard playersGame |
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	playersBoard := #('martin' 'juan' 'roman').
+	playersGame := #('mateo' 'juan' 'roman').
+	fifteenCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenCells.
+	aCircularBoard := CircularBoard
+		with: playersBoard
+		andWithAll: fifteenCells.
+	deck := self randomDeck.
+	amountOfInitialCards := -1.
+	self
+		should: [ RedGame
+				with: aCircularBoard
+				with: aDieHandle
+				with: deck
+				withLaps: 2
+				with: playersGame
+				andWith: amountOfInitialCards ]
+		raise: Error
+		withMessage: 'game and board must have the same players'
 ]
 
 { #category : #tests }
@@ -926,6 +1055,51 @@ RedGameTest >> testCannotUseACardAfterTheGameHasEnded [
 ]
 
 { #category : #tests }
+RedGameTest >> testGoBackwardsIfAccumulatedEffectsGiveANegativeResult [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards die dice |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: OverloadCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	die := LoadedDie with: 3.
+	dice := Array with: die.
+	aDieHandle := DieHandle with: dice.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	game finishTurn.
+	game rollDiceFor: 'juan'.
+	game finishTurn.
+	game rollDiceFor: 'martin'.
+	move := TargetMove
+		from: 'martin'
+		with: OverloadCard new
+		against: 'juan'.
+	game play: move.
+	game finishTurn.
+	move := TargetMove
+		from: 'juan'
+		with: OverloadCard new
+		against: 'juan'.
+	game play: move.
+	game rollDiceFor: 'juan'.
+	game finishTurn.
+	self assert: (game positionOf: 'juan') equals: 2
+]
+
+{ #category : #tests }
 RedGameTest >> testPlayAGameAndAskWhoWon [
 	| aCircularBoard aDieHandle players aGame fifteenRegularCells deck amountOfInitialCards |
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
@@ -995,33 +1169,6 @@ RedGameTest >> testPlayAGameWithRegularCells [
 		andWith: amountOfInitialCards.
 	self playWithoutMoves: aGame.
 	self assert: aGame hasEnded
-]
-
-{ #category : #tests }
-RedGameTest >> testPlayARepeatCardHasNoEffectBeforeAnyoneRollsTheDice [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: (DiscreteProbabilityEvent of: RepeatCard new with: 1).
-	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 15 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	amountOfInitialCards := 2.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		with: deck
-		withLaps: 1
-		with: players
-		andWith: amountOfInitialCards .
-	move := TargetMove from: 'juan' with: RepeatCard new against: 'juan'.
-	game play: move.
-	self assert: (game positionOf: 'juan') equals: 0
 ]
 
 { #category : #tests }
@@ -1198,6 +1345,33 @@ RedGameTest >> testPlayAnInstantCardWhenItsNotYourTurn [
 
 	self assert: (game positionOf: 'juan') equals: 4.
 	self assert: (game positionOf: 'martin') equals: 10.
+]
+
+{ #category : #tests }
+RedGameTest >> testPlayingARepeatCardHasNoEffectIfAnyoneRollsTheDice [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: RepeatCard new with: 1).
+	deck := Deck with: (RandomSource basedOn: cardsDistribution).
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards .
+	move := TargetMove from: 'juan' with: RepeatCard new against: 'juan'.
+	game play: move.
+	self assert: (game positionOf: 'juan') equals: 0
 ]
 
 { #category : #tests }
