@@ -29,7 +29,7 @@ CardDealer >> addCardTo: aPlayerName [
 	assignatedCards add: (AssignatedCard from: aPlayerName with: deck takeACard).
 ]
 
-{ #category : #initialize }
+{ #category : #actions }
 CardDealer >> addToPermanentMoves: aMove [
 	permanentMoves add: aMove copy.
 ]
