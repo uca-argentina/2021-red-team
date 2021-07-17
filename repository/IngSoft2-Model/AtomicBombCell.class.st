@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #actions }
-AtomicBombCell >> activateEffect: circularBoard from: playerName with: aRedGame [ 
+AtomicBombCell >> activateEffect: circularBoard from: playerName with: cardDealer [
 	circularBoard moveEveryoneToTheBeginningOfTheLap.
 ]

@@ -5,8 +5,14 @@ Class {
 }
 
 { #category : #actions }
-RepeatCard >> activateEffectWith: redGame and: aMove [ 
+RepeatCard >> activateEffectWith: redGame and: aMove [
+	self assertTargeted: aMove .
 	redGame useLastBoardEffectOn: aMove target.
+]
+
+{ #category : #actions }
+RepeatCard >> assertTargeted: aMove [.
+	(aMove class = TargetedMove ) ifFalse: [ self error: self className , ' must be played on a Targeted Move' ].
 ]
 
 { #category : #actions }

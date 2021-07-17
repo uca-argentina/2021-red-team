@@ -1,15 +1,15 @@
 Class {
-	#name : #RedoCard,
+	#name : #FreedomCard,
 	#superclass : #Object,
 	#category : #'IngSoft2-Model'
 }
 
 { #category : #actions }
-RedoCard >> activateEffectWith: game and: aMove [ 
-	game useLastCardEffectWith: aMove.
+FreedomCard >> activateEffectWith: aRedGame and: aMove [ 
+	aRedGame breakFree: (aMove source).
 ]
 
 { #category : #actions }
-RedoCard >> equals: anotherCard [
+FreedomCard >> equals: anotherCard [
 	^ self class = anotherCard class.
 ]

@@ -5,6 +5,6 @@ Class {
 }
 
 { #category : #actions }
-RegularCell >> activateEffect: aCircularBoard from: aString with: aRedGame [ 
+RegularCell >> activateEffect: aCircularBoard from: playerName with: cardDealer [
 	
 ]

@@ -13,11 +13,6 @@ AssignatedCard class >> from: aPlayer with: aCard [
 	^self new initializeWith: aPlayer andWith: aCard.
 ]
 
-{ #category : #queries }
-AssignatedCard >> card [
-	^ card
-]
-
 { #category : #initialize }
 AssignatedCard >> initializeWith: aPlayer andWith: aCard [
 	player := aPlayer.
@@ -25,6 +20,6 @@ AssignatedCard >> initializeWith: aPlayer andWith: aCard [
 ]
 
 { #category : #queries }
-AssignatedCard >> player [
-	^ player
+AssignatedCard >> isAssignated: aCard To: aPlayer [
+	^ ((aCard equals: card) and: [aPlayer = player])
 ]

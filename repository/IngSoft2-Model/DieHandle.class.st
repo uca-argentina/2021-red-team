@@ -13,6 +13,13 @@ DieHandle class >> with: dice [
 	^ self new initializeWith: dice.
 ]
 
+{ #category : #queries }
+DieHandle >> hasRolledMax: rollValue [ 
+	| maxValue |
+	maxValue := dice sum: [ :die | die faces ].
+	^ rollValue = maxValue.
+]
+
 { #category : #initialize }
 DieHandle >> initializeWith: anArrayOfDie [
 	dice := anArrayOfDie.

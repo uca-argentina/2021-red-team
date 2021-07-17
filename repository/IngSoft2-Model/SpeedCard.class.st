@@ -6,8 +6,14 @@ Class {
 
 { #category : #actions }
 SpeedCard >> activateEffectWith: game and: aMove [ 
-	( game whosTurnIsIt = aMove source) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
-	game addToPermanentMoves: aMove.
+	self assertTargeted: aMove.
+	( game currentPlayer = aMove source) ifFalse: [ self error: 'cant use a permanent card on anothers turn' ].
+	game addPermanentEffect: aMove.
+]
+
+{ #category : #actions }
+SpeedCard >> assertTargeted: aMove [.
+	(aMove class = TargetedMove ) ifFalse: [ self error: self className , ' must be played on a Targeted Move' ].
 ]
 
 { #category : #queries }

@@ -3,7 +3,7 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'player',
-		'reach'
+		'station'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -21,13 +21,13 @@ Position class >> from: playerName with: newValue [
 
 { #category : #queries }
 Position >> >= aPosition [ 
-	^ (reach >= aPosition valueOfPosition).
+	^ (station >= aPosition valueOfPosition).
 ]
 
 { #category : #initialize }
 Position >> initializeWith: name andWith: newValue [
 	player := name.
-	reach := newValue .
+	station := newValue .
 ]
 
 { #category : #queries }
@@ -38,7 +38,7 @@ Position >> nameOfPlayer [
 { #category : #actions }
 Position >> updateWith: distance [
 	| newValue newPosition |
-	newValue := (reach + distance) max: 1.
+	newValue := (station + distance) max: 1.
 	newPosition := self class from: player with: newValue.
 	^newPosition.
 	
@@ -47,5 +47,5 @@ Position >> updateWith: distance [
 
 { #category : #queries }
 Position >> valueOfPosition [
-	^ reach.
+	^ station.
 ]

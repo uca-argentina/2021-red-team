@@ -6,7 +6,8 @@ Class {
 		'board',
 		'laps',
 		'playerSequence',
-		'cardDealer'
+		'cardDealer',
+		'lastToRoll'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -23,8 +24,42 @@ RedGame class >> with: aCircularBoard with: aDieHandle with: aDeck withLaps: aNu
 ]
 
 { #category : #actions }
-RedGame >> addToPermanentMoves: aMove [
-	cardDealer addToPermanentMoves: aMove.
+RedGame >> addPermanentEffect: aMove [
+	cardDealer addPermanentEffect: aMove.
+]
+
+{ #category : #actions }
+RedGame >> assertCorrespondentTurn: playerName [
+	playerName = playerSequence currentPlayer
+		ifFalse: [ self error: 'cant play on anothers turn' ]
+]
+
+{ #category : #actions }
+RedGame >> assertIfGameHasEnded [
+	self hasEnded
+		ifTrue: [ self error: 'the game has ended' ]
+]
+
+{ #category : #actions }
+RedGame >> assertIfItsPlaying: playerName [
+	(playerSequence assertIfItsPlaying: playerName)
+		ifFalse: [ self error: 'Cannot roll for a player that is not playing' ]
+]
+
+{ #category : #actions }
+RedGame >> assertLastToRoll: playerName [
+	playerName = lastToRoll 
+		ifTrue: [ self error: 'can only roll the dice once on your turn' ]
+]
+
+{ #category : #actions }
+RedGame >> breakFree: playerName [ 
+	board breakFree: playerName .
+]
+
+{ #category : #queries }
+RedGame >> currentPlayer [
+	^ playerSequence currentPlayer.
 ]
 
 { #category : #actions }
@@ -53,7 +88,7 @@ RedGame >> lapOf: playerName [
 
 { #category : #actions }
 RedGame >> play: aMove [
-	self verifyIfGameHasEnded.
+	self assertIfGameHasEnded.
 	cardDealer handle: aMove with: self.
 ]
 
@@ -68,22 +103,26 @@ RedGame >> rankingOf: name [
 ]
 
 { #category : #actions }
-RedGame >> removePermanentMove: aMove [ 
-	cardDealer removePermanentMove: aMove.
+RedGame >> removePermanentEffect: aMove [ 
+	cardDealer removePermanentEffect: aMove.
 ]
 
 { #category : #actions }
 RedGame >> rollDiceFor: playerName [
-	| permanentCardsResult |
-	self verifyIfGameHasEnded.
-	self verifyIfItsPlaying: playerName.
-	self verifyCorrespondentTurn: playerName.
+	| permanentCardsResult rollValue |
+	self assertIfGameHasEnded.
+	self assertIfItsPlaying: playerName.
+	self assertCorrespondentTurn: playerName.
+	self assertLastToRoll: playerName. 
+	rollValue := dieHandle roll .
+	board assertFreedom: playerName with: dieHandle and: rollValue .
 	permanentCardsResult := cardDealer
 		accumulatePermanentEffectsOn: playerName.
 	board
 		with: cardDealer
 		move: playerName
-		with: dieHandle roll + permanentCardsResult
+		with: rollValue + permanentCardsResult.
+	lastToRoll := playerName. 
 ]
 
 { #category : #actions }
@@ -96,32 +135,9 @@ RedGame >> useLastCardEffectWith: aMove [
 	cardDealer useLastCardEffectWith: aMove andWith: self. 
 ]
 
-{ #category : #actions }
-RedGame >> verifyCorrespondentTurn: playerName [
-	playerName = playerSequence whosTurnIsIt
-		ifFalse: [ self error: 'cant play on anothers turn' ]
-]
-
-{ #category : #actions }
-RedGame >> verifyIfGameHasEnded [
-	self hasEnded
-		ifTrue: [ self error: 'the game has ended' ]
-]
-
-{ #category : #actions }
-RedGame >> verifyIfItsPlaying: playerName [
-	(playerSequence verifyIfItsPlaying: playerName)
-		ifFalse: [ self error: 'Cannot roll for a player that is not playing' ]
-]
-
 { #category : #queries }
-RedGame >> whoWon [
+RedGame >> winner [
 	self hasEnded
 		ifFalse: [ self error: 'the game is still running' ].
-	^board whoWon.
-]
-
-{ #category : #queries }
-RedGame >> whosTurnIsIt [
-	^ playerSequence whosTurnIsIt.
+	^board winner.
 ]
