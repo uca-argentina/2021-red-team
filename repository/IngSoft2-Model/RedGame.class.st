@@ -115,7 +115,6 @@ RedGame >> rollDiceFor: playerName [
 	self assertCorrespondentTurn: playerName.
 	self assertLastToRoll: playerName. 
 	rollValue := dieHandle roll .
-	board assertFreedom: playerName with: dieHandle and: rollValue .
 	permanentCardsResult := cardDealer
 		accumulatePermanentEffectsOn: playerName.
 	board

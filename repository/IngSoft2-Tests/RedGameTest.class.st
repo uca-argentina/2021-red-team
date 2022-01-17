@@ -473,76 +473,6 @@ RedGameTest >> testAskRankingOfPlayerDuringTheGame [
 ]
 
 { #category : #tests }
-RedGameTest >> testBreakeFreeByAFreedomCard [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck amountOfInitialCards die dice move |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: (DiscreteProbabilityEvent of: FreedomCard new with: 1).
-	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	die := HalfLoadedDie with: 6.
-	dice := Array with: die.
-	aDieHandle := DieHandle with: dice. 
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 2 to: fifteenRegularCells.
-	self add: PrisionCell new times: 1 to: fifteenRegularCells.
-	self add: RegularCell new times: 12 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	amountOfInitialCards := 2.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		with: deck
-		withLaps: 1
-		with: players
-		andWith: amountOfInitialCards.
-	game rollDiceFor: 'martin'.
-	game finishTurn.
-	game rollDiceFor: 'juan'.
-	game finishTurn.
-	move := Move from: 'martin' with: FreedomCard new.
-	game play: move.
-	game rollDiceFor: 'martin'.
-	game finishTurn.
-	self assert: (game positionOf: 'martin') equals: 6.
-]
-
-{ #category : #tests }
-RedGameTest >> testBreakeFreeByMaxRollValue [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck amountOfInitialCards |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: (DiscreteProbabilityEvent of: SpeedCard new with: 1).
-	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 5 to: fifteenRegularCells.
-	self add: PrisionCell new times: 1 to: fifteenRegularCells.
-	self add: RegularCell new times: 9 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	amountOfInitialCards := 0.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		with: deck
-		withLaps: 1
-		with: players
-		andWith: amountOfInitialCards.
-	game rollDiceFor: 'martin'.
-	game finishTurn.
-	game rollDiceFor: 'juan'.
-	game finishTurn.
-	game rollDiceFor: 'martin'.
-	game finishTurn.
-	self assert: (game positionOf: 'martin') equals: 12.
-]
-
-{ #category : #tests }
 RedGameTest >> testCannotAskARandomSourceToProduceAnInvalidNumberOfItems [
 	| randomSource |
 	cardsDistribution := OrderedCollection new.
@@ -1145,41 +1075,6 @@ RedGameTest >> testGoBackwardsIfAccumulatedEffectsGiveANegativeResult [
 	game rollDiceFor: 'juan'.
 	game finishTurn.
 	self assert: (game positionOf: 'juan') equals: 2
-]
-
-{ #category : #tests }
-RedGameTest >> testLandOnAPrisionCell [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck amountOfInitialCards die dice |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: (DiscreteProbabilityEvent of: SpeedCard new with: 1).
-	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	die := HalfLoadedDie with: 6.
-	dice := Array with: die.
-	aDieHandle := DieHandle with: dice. 
-	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 5 to: fifteenRegularCells.
-	self add: PrisionCell new times: 1 to: fifteenRegularCells.
-	self add: RegularCell new times: 9 to: fifteenRegularCells.
-	aCircularBoard := CircularBoard
-		with: players
-		andWithAll: fifteenRegularCells.
-	amountOfInitialCards := 0.
-	game := RedGame
-		with: aCircularBoard
-		with: aDieHandle
-		with: deck
-		withLaps: 1
-		with: players
-		andWith: amountOfInitialCards.
-	game rollDiceFor: 'martin'.
-	game finishTurn.
-	game rollDiceFor: 'juan'.
-	game finishTurn.
-	game rollDiceFor: 'martin'.
-	game finishTurn.
-	self assert: (game positionOf: 'martin') equals: 6.
 ]
 
 { #category : #tests }

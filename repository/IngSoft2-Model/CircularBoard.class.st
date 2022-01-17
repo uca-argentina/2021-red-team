@@ -30,28 +30,11 @@ CircularBoard >> arePlaying: players [
 	^positionsBoard arePlaying: players.
 ]
 
-{ #category : #actions }
-CircularBoard >> assertFreedom: playerName with: aDieHandle and: rollValue [ 
-	(prision isArrested: playerName)
-		ifTrue: [ prision assertFreedom: playerName with: aDieHandle and: rollValue ].
-]
-
-{ #category : #actions }
-CircularBoard >> assertIfIsPrisioner: playerName with: rollValue [ 
-	^ (prision isArrested: playerName) ifTrue: [ 0 ] ifFalse: [ rollValue  ].
-]
-
-{ #category : #actions }
-CircularBoard >> breakFree: playerName [
-	prision breakFree: playerName.
-]
-
 { #category : #initialize }
 CircularBoard >> initializeWith: positions andWithAll: collectionOfCells [
 	cells := collectionOfCells.
 	positionsBoard := positions.
 	lastCell := RegularCell new.
-	prision := Prision with: OrderedCollection new.
 	
 ]
 
@@ -115,9 +98,8 @@ CircularBoard >> winner [
 
 { #category : #actions }
 CircularBoard >> with: cardDealer  move: player with: rollValue [
-	| currentPosition currentCell cellsToMove |
-	cellsToMove := self assertIfIsPrisioner: player with: rollValue .
-	positionsBoard updatePositionOf: player with: cellsToMove.
+	| currentPosition currentCell|
+	positionsBoard updatePositionOf: player with: rollValue.
 	currentPosition := self positionOnLap: player.
 	currentCell := cells at: currentPosition.
 	lastCell := currentCell .
