@@ -10,11 +10,6 @@ Class {
 }
 
 { #category : #'instance creation' }
-Deck class >> with: aRandomSource [ 
-	^ self new initializeWith: aRandomSource.
-]
-
-{ #category : #'instance creation' }
 Deck class >> with: aRandomSource andSize: amountOfCards [
 	^ self new initializeWith: aRandomSource andWith: amountOfCards.
 ]
@@ -28,11 +23,6 @@ Deck >> addCardToDiscardedDeck: card [
 Deck >> discardedDeckIsEmpty [
 	discardedDeck ifEmpty: [ self error: 'cant take a card when both decks are empty' ].
 	
-]
-
-{ #category : #initialize }
-Deck >> initializeWith: aRandomSource [ 
-	cardsSource:= aRandomSource.
 ]
 
 { #category : #initialize }

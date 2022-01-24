@@ -58,21 +58,6 @@ RedGameTest >> randomBoardWith: players andWith: numberOfCells [
 	^ aCircularBoard
 ]
 
-{ #category : #tests }
-RedGameTest >> randomDeck [
-	| deck  |
-	cardsDistribution := OrderedCollection new.
-	cardsDistribution
-		add: (DiscreteProbabilityEvent of: (OverloadCard new) with: 0.17);
-		add: (DiscreteProbabilityEvent of: (RedoCard  new) with: 0.17);
-		add: (DiscreteProbabilityEvent of: (AccelerationCard  new) with: 0.17);
-		add: (DiscreteProbabilityEvent of: (RepeatCard  new) with: 0.17);
-		add: (DiscreteProbabilityEvent of: (CancellationCard new) with: 0.16);
-		add: (DiscreteProbabilityEvent of: (SpeedCard  new) with: 0.16).
-	deck := Deck with: (RandomSource basedOn: cardsDistribution).
-	^ deck
-]
-
 { #category : #actions }
 RedGameTest >> randomDeckOfSize: size [
 	| deck  |
@@ -683,7 +668,7 @@ RedGameTest >> testCannotCreateAGameWithDiffetenPlayersThanBoard [
 	aCircularBoard := CircularBoard
 		with: playersBoard
 		andWithAll: fifteenCells.
-	deck := self randomDeck.
+	deck := self randomDeckOfSize: 50.
 	amountOfInitialCards := -1.
 	self
 		should: [ RedGame
@@ -707,7 +692,7 @@ RedGameTest >> testCannotCreateAGameWithInvalidNumberOfInitialCards [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenCells.
-	deck := self randomDeck.
+	deck := self randomDeckOfSize: 50.
 	amountOfInitialCards := -1.
 	self
 		should: [ RedGame
@@ -731,7 +716,7 @@ RedGameTest >> testCannotCreateAGameWithInvalidNumberOfLaps [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenCells.
-	deck := self randomDeck.
+	deck := self randomDeckOfSize: 50.
 	amountOfInitialCards := 2.
 	self
 		should: [ RedGame
@@ -757,7 +742,7 @@ RedGameTest >> testCannotCreateAGameWithoutPlayers [
 	aCircularBoard := CircularBoard
 		with: players
 		andWithAll: fifteenCells.
-	deck := self randomDeck.
+	deck := self randomDeckOfSize: 50.
 	players := #().
 	amountOfInitialCards := 2.
 	self
