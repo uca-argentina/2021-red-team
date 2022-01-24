@@ -20,6 +20,6 @@ AssignatedCard >> initializeWith: aPlayer andWith: aCard [
 ]
 
 { #category : #queries }
-AssignatedCard >> isAssignated: aCard To: aPlayer [
+AssignatedCard >> isAssignated: aCard to: aPlayer [
 	^ ((aCard equals: card) and: [aPlayer = player])
 ]

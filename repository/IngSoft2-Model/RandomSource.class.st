@@ -13,7 +13,7 @@ RandomSource class >> basedOn: eventsDistribution [
 	| probability |
 	eventsDistribution ifEmpty: [ self error: 'cant create a RandomSource without a events distribution' ].
 	probability := eventsDistribution sum: [ :event | event probability].
-	(probability < 0.99 or: [probability > 1.01]) ifTrue: [ self error: 'The sum of all events probabilities must sum 1' ].
+	(probability < 0.99 or: [probability > 1.01]) ifTrue: [ self error: 'The sum of all events probabilities must be 1' ].
 	^self new initializeWith: eventsDistribution .
 ]
 

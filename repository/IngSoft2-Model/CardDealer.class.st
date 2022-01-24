@@ -35,7 +35,7 @@ CardDealer >> addPermanentEffect: aMove [
 CardDealer >> assertIfCardIsAssignated: aMove [
 	assignatedCards
 		detect: [ :assignatedCard | 
-			assignatedCard isAssignated: aMove card To: aMove source ]
+			assignatedCard isAssignated: aMove card to: aMove source ]
 		ifFound: [ :assignatedCard | assignatedCards remove: assignatedCard ]
 		ifNone: [ self error: 'cant use a card thats not yours' ]
 ]
@@ -44,7 +44,8 @@ CardDealer >> assertIfCardIsAssignated: aMove [
 CardDealer >> handle: aMove with: aGame [ 
 	self assertIfCardIsAssignated: aMove.
 	aMove activateEffect: aGame .
-	self updateLastMove: aMove
+	self updateLastMove: aMove.
+	deck addCardToDiscardedDeck: aMove card.
 ]
 
 { #category : #initialize }

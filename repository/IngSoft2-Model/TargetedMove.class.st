@@ -42,9 +42,9 @@ TargetedMove >> equalsMove: anotherMove [
 ]
 
 { #category : #initialize }
-TargetedMove >> initializeWith: aMove against: objetive [
+TargetedMove >> initializeWith: aMove against: objective [
 	move := aMove .
-	target := objetive.
+	target := objective.
 ]
 
 { #category : #queries }

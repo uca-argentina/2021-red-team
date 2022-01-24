@@ -82,11 +82,6 @@ CircularBoard >> repeatLastEffectOn: playerName with: aRedGame [
 ]
 
 { #category : #actions }
-CircularBoard >> takeToPrision: playerName [
-	prision addPrisioner: playerName .
-]
-
-{ #category : #actions }
 CircularBoard >> updatePositionOf: player with: value [  
 	positionsBoard updatePositionOf: player with: value. 
 ]
