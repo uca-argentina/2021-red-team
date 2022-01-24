@@ -132,20 +132,20 @@ RedGameTest >> testACancellationMove [
 
 { #category : #tests }
 RedGameTest >> testACardCell [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck amountOfInitialCards move |
+	| aDieHandle players fifteenCells aCircularBoard game deck amountOfInitialCards move |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
 		add: (DiscreteProbabilityEvent of: SpeedCard new with: 1).
 	deck := Deck with: (RandomSource basedOn: cardsDistribution) andSize: 50.
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
 	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 5 to: fifteenRegularCells.
-	self add: CardCell new times: 1 to: fifteenRegularCells.
-	self add: RegularCell new times: 9 to: fifteenRegularCells.
+	fifteenCells := OrderedCollection new.
+	self add: RegularCell new times: 5 to: fifteenCells.
+	self add: CardCell new times: 1 to: fifteenCells.
+	self add: RegularCell new times: 9 to: fifteenCells.
 	aCircularBoard := CircularBoard
 		with: players
-		andWithAll: fifteenRegularCells.
+		andWithAll: fifteenCells.
 	amountOfInitialCards := 0.
 	game := RedGame
 		with: aCircularBoard
@@ -260,20 +260,20 @@ RedGameTest >> testARedoMoveAfterARedoMoveReusesTheSameCard [
 
 { #category : #tests }
 RedGameTest >> testARepeatMove [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
+	| aDieHandle players fifteenCells aCircularBoard game deck move amountOfInitialCards |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
 		add: (DiscreteProbabilityEvent of: RepeatCard new with: 1).
 	deck := Deck with: (RandomSource basedOn: cardsDistribution) andSize: 50.
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
 	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 5 to: fifteenRegularCells.
-	self add: SpeedUpCell new times: 1 to: fifteenRegularCells.
-	self add: RegularCell new times: 9 to: fifteenRegularCells.
+	fifteenCells := OrderedCollection new.
+	self add: RegularCell new times: 5 to: fifteenCells.
+	self add: SpeedUpCell new times: 1 to: fifteenCells.
+	self add: RegularCell new times: 9 to: fifteenCells.
 	aCircularBoard := CircularBoard
 		with: players
-		andWithAll: fifteenRegularCells.
+		andWithAll: fifteenCells.
 	amountOfInitialCards := 2.
 	game := RedGame
 		with: aCircularBoard
@@ -824,7 +824,7 @@ RedGameTest >> testCannotCreateARandomSourceWithEventsProbabilitiesWhichDontSum1
 	cardsDistribution
 		add: (DiscreteProbabilityEvent of: RepeatCard new with: 0.6);
 		add: (DiscreteProbabilityEvent of: AccelerationCard new with: 0.6).
-	self should: [Deck with: (RandomSource basedOn: cardsDistribution)] raise: Error withMessage: 'The sum of all events probabilities must be 1'.
+	self should: [Deck with: (RandomSource basedOn: cardsDistribution) andSize: 50] raise: Error withMessage: 'The sum of all events probabilities must be 1'.
 	
 ]
 
@@ -875,7 +875,7 @@ RedGameTest >> testCannotDuplicateTheEffectOfACardThatHasntBeenPlayed [
 	self
 		should: [ game play: move ]
 		raise: Error
-		withMessage: 'Cant duplicate the effect of a card that wasnt played'.
+		withMessage: 'Cant use SpeedBoost over a card that wasnt played or that isnt permanent'.
 ]
 
 { #category : #tests }
@@ -1135,7 +1135,7 @@ RedGameTest >> testCannotTakeACardWhenBothDecksAreEmpty [
 
 { #category : #tests }
 RedGameTest >> testCannotTakeACardWhenBothLoadedDecksAreEmpty [
-	| aDieHandle players twelveRegularCells aCircularBoard game deck cards amountOfInitialCards |
+	| aDieHandle players twelveCells aCircularBoard game deck cards amountOfInitialCards |
 	cards := OrderedCollection new.
 	cards
 		add: RedoCard new;
@@ -1145,12 +1145,12 @@ RedGameTest >> testCannotTakeACardWhenBothLoadedDecksAreEmpty [
 	deck := LoadedDeck with: cards.
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
 	players := #('martin' 'juan').
-	twelveRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 11 to: twelveRegularCells.
-	self add: CardCell new times: 1 to: twelveRegularCells.
+	twelveCells := OrderedCollection new.
+	self add: RegularCell new times: 11 to: twelveCells.
+	self add: CardCell new times: 1 to: twelveCells.
 	aCircularBoard := CircularBoard
 		with: players
-		andWithAll: twelveRegularCells.
+		andWithAll: twelveCells.
 	amountOfInitialCards := 2.
 	game := RedGame
 		with: aCircularBoard
@@ -1232,6 +1232,46 @@ RedGameTest >> testCannotUseASpeedBoostCardIfNoPermanentCardsAreActive [
 		should: [ game play: move ]
 		raise: Error
 		withMessage: 'there are no permanent cards'.
+]
+
+{ #category : #tests }
+RedGameTest >> testCannotUseASpeedBoostCardOverANonPermanentCard [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards cards objectiveMove |
+	cards := OrderedCollection new.
+	cards
+		add: SpeedCard new;
+		add: RepeatCard new;
+		add: OverloadCard new;
+		add: SpeedBoostCard new.
+	deck := LoadedDeck with: cards.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	move := TargetedMove with: (Move from: 'martin' with: SpeedCard new) against: 'martin'.
+	game play: move.
+	game rollDiceFor: 'martin'.
+	move := TargetedMove with: (Move from: 'martin' with: RepeatCard new) against: 'juan'.
+	game play: move.
+	game finishTurn.
+	game rollDiceFor: 'juan'.
+	objectiveMove := TargetedMove with: (Move from: 'martin' with: RepeatCard new) against: 'juan'.
+	move := TargetedMove with: (Move from: 'juan' with: SpeedBoostCard new) against: objectiveMove .
+	self
+		should: [ game play: move ]
+		raise: Error
+		withMessage: 'Cant use SpeedBoost over a card that wasnt played or that isnt permanent'.
 ]
 
 { #category : #tests }
@@ -1529,7 +1569,7 @@ RedGameTest >> testNewActiveDeckCreatedFromTheDiscardedDeck [
 
 { #category : #tests }
 RedGameTest >> testNewActiveLoadedDeckCreatedFromTheDiscardedLoadedDeck [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards amountOfInitialCards |
+	| aDieHandle players fifteenCells aCircularBoard game deck move cards amountOfInitialCards |
 	cards := OrderedCollection new.
 	cards
 		add: RedoCard new;
@@ -1539,12 +1579,12 @@ RedGameTest >> testNewActiveLoadedDeckCreatedFromTheDiscardedLoadedDeck [
 	deck := LoadedDeck with: cards.
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
 	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 14 to: fifteenRegularCells.
-	self add: CardCell new times: 1 to: fifteenRegularCells.
+	fifteenCells := OrderedCollection new.
+	self add: RegularCell new times: 14 to: fifteenCells.
+	self add: CardCell new times: 1 to: fifteenCells.
 	aCircularBoard := CircularBoard
 		with: players
-		andWithAll: fifteenRegularCells.
+		andWithAll: fifteenCells.
 	amountOfInitialCards := 2.
 	game := RedGame
 		with: aCircularBoard
@@ -1764,20 +1804,20 @@ RedGameTest >> testPlayATurnAndLandOnAnAtomicBombCell [
 
 { #category : #tests }
 RedGameTest >> testPlayAnInstantCardWhenItsNotYourTurn [
-	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
+	| aDieHandle players fifteenCells aCircularBoard game deck move amountOfInitialCards |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
 		add: (DiscreteProbabilityEvent of: RepeatCard new with: 1).
 	deck := Deck with: (RandomSource basedOn: cardsDistribution) andSize: 50.
 	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
 	players := #('martin' 'juan').
-	fifteenRegularCells := OrderedCollection new.
-	self add: RegularCell new times: 5 to: fifteenRegularCells.
-	self add: SpeedUpCell new times: 1 to: fifteenRegularCells.
-	self add: RegularCell new times: 9 to: fifteenRegularCells.
+	fifteenCells := OrderedCollection new.
+	self add: RegularCell new times: 5 to: fifteenCells.
+	self add: SpeedUpCell new times: 1 to: fifteenCells.
+	self add: RegularCell new times: 9 to: fifteenCells.
 	aCircularBoard := CircularBoard
 		with: players
-		andWithAll: fifteenRegularCells.
+		andWithAll: fifteenCells.
 	amountOfInitialCards := 2.
 	game := RedGame
 		with: aCircularBoard

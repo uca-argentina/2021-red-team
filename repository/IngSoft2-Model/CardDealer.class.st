@@ -41,9 +41,9 @@ CardDealer >> assertIfCardIsAssignated: aMove [
 ]
 
 { #category : #actions }
-CardDealer >> duplicateEffect: aMove with: game [ 
+CardDealer >> duplicateEffect: aMove with: game [
 	permanentEffects ifEmpty: [ self error: 'there are no permanent cards' ].
-	(permanentEffects anySatisfy: [ :move | move equalsMove: aMove ]) ifFalse: [ self error: 'Cant duplicate the effect of a card that wasnt played' ].
+	(permanentEffects anySatisfy: [ :move | move equalsMove: aMove ]) ifFalse: [ self error: 'Cant use SpeedBoost over a card that wasnt played or that isnt permanent' ].
 	aMove activateEffect: game.
 ]
 
