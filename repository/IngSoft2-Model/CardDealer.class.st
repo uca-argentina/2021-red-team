@@ -41,6 +41,13 @@ CardDealer >> assertIfCardIsAssignated: aMove [
 ]
 
 { #category : #actions }
+CardDealer >> duplicateEffect: aMove with: game [ 
+	permanentEffects ifEmpty: [ self error: 'there are no permanent cards' ].
+	(permanentEffects anySatisfy: [ :move | move equalsMove: aMove ]) ifFalse: [ self error: 'Cant duplicate the effect of a card that wasnt played' ].
+	aMove activateEffect: game.
+]
+
+{ #category : #actions }
 CardDealer >> handle: aMove with: aGame [ 
 	self assertIfCardIsAssignated: aMove.
 	aMove activateEffect: aGame .

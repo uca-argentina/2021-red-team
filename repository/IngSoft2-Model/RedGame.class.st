@@ -58,6 +58,11 @@ RedGame >> currentPlayer [
 ]
 
 { #category : #actions }
+RedGame >> duplicateMoveEffect: aMove [ 
+	cardDealer duplicateEffect: aMove with: self.
+]
+
+{ #category : #actions }
 RedGame >> finishTurn [
 	^ playerSequence finishTurn.
 ]

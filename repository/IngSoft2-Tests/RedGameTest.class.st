@@ -294,6 +294,54 @@ RedGameTest >> testARepeatMove [
 ]
 
 { #category : #tests }
+RedGameTest >> testASpeedBoostMove [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards objectiveMove amountOfInitialCards|
+	cards := OrderedCollection new.
+	cards
+		add: OverloadCard new;
+		add: SpeedBoostCard new;
+		add: OverloadCard new;
+		add: RepeatCard new.
+	deck := LoadedDeck with: cards.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	move := TargetedMove
+		with: (Move from: 'martin' with: OverloadCard new) against: 'juan'.
+	game play: move.
+	game finishTurn.
+	move := TargetedMove
+		with: (Move from: 'juan' with: OverloadCard new) against: 'martin'.
+	game play: move.
+	game rollDiceFor: 'juan'.
+	game finishTurn.
+	objectiveMove := TargetedMove
+		with: (Move from: 'martin' with: OverloadCard new) against: 'juan'.
+	move := TargetedMove
+		with: (Move from: 'martin' with: SpeedBoostCard new) against: objectiveMove .
+	game play: move.
+	game rollDiceFor: 'martin'.
+	game finishTurn.
+	game rollDiceFor: 'juan'.
+	game finishTurn.
+	self assert: (game positionOf: 'juan') equals: 6.
+	self assert: (game positionOf: 'martin') equals: 10
+]
+
+{ #category : #tests }
 RedGameTest >> testASpeedMove [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
 	cardsDistribution := OrderedCollection new.
@@ -789,6 +837,48 @@ RedGameTest >> testCannotCreateARandomSourceWithoutAEventsDistribution [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotDuplicateTheEffectOfACardThatHasntBeenPlayed [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards cards objectiveMove |
+	cards := OrderedCollection new.
+	cards
+		add: SpeedCard new;
+		add: RepeatCard new;
+		add: OverloadCard new;
+		add: SpeedBoostCard new.
+	deck := LoadedDeck with: cards.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	move := TargetedMove
+		with: (Move from: 'martin' with: SpeedCard new) against: 'martin'.
+	game play: move.
+	game finishTurn.
+	game rollDiceFor: 'juan'.
+	objectiveMove := TargetedMove
+		with: (Move from: 'juan' with: OverloadCard new) against: 'martin'.
+	move := TargetedMove
+		with: (Move from: 'juan' with: SpeedBoostCard new) against: objectiveMove .
+	
+	self
+		should: [ game play: move ]
+		raise: Error
+		withMessage: 'Cant duplicate the effect of a card that wasnt played'.
+]
+
+{ #category : #tests }
 RedGameTest >> testCannotPlayACardYouDontHave [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
 	cardsDistribution := OrderedCollection new.
@@ -1108,6 +1198,43 @@ RedGameTest >> testCannotUseACardAfterTheGameHasEnded [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotUseASpeedBoostCardIfNoPermanentCardsAreActive [
+	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards cards objectiveMove |
+	cards := OrderedCollection new.
+	cards
+		add: SpeedCard new;
+		add: RepeatCard new;
+		add: OverloadCard new;
+		add: SpeedBoostCard new.
+	deck := LoadedDeck with: cards.
+	aDieHandle := self dieHandleWithALoadedDieThatRollsSix.
+	players := #('martin' 'juan').
+	fifteenRegularCells := OrderedCollection new.
+	self add: RegularCell new times: 15 to: fifteenRegularCells.
+	aCircularBoard := CircularBoard
+		with: players
+		andWithAll: fifteenRegularCells.
+	amountOfInitialCards := 2.
+	game := RedGame
+		with: aCircularBoard
+		with: aDieHandle
+		with: deck
+		withLaps: 1
+		with: players
+		andWith: amountOfInitialCards.
+	game rollDiceFor: 'martin'.
+	game finishTurn.
+	game rollDiceFor: 'juan'.
+	objectiveMove := TargetedMove with: (Move from: 'juan' with: OverloadCard new) against: 'martin'.
+	move := TargetedMove with: (Move from: 'juan' with: SpeedBoostCard new) against: objectiveMove .
+	
+	self
+		should: [ game play: move ]
+		raise: Error
+		withMessage: 'there are no permanent cards'.
+]
+
+{ #category : #tests }
 RedGameTest >> testCardsGoToTheDiscardedDeckWhenPlayed [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards die dice |
 	cardsDistribution := OrderedCollection new.
@@ -1401,7 +1528,7 @@ RedGameTest >> testNewActiveDeckCreatedFromTheDiscardedDeck [
 ]
 
 { #category : #tests }
-RedGameTest >> testNewActiveLoadedDeckCreatedFromDiscardedLoadedDeck [
+RedGameTest >> testNewActiveLoadedDeckCreatedFromTheDiscardedLoadedDeck [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move cards amountOfInitialCards |
 	cards := OrderedCollection new.
 	cards
