@@ -11,6 +11,7 @@ Class {
 
 { #category : #'instance creation' }
 Deck class >> with: aRandomSource andSize: amountOfCards [
+	(amountOfCards = 0) ifTrue: [ self error: 'Cant create a Deck without cards' ].
 	^ self new initializeWith: aRandomSource andWith: amountOfCards.
 ]
 

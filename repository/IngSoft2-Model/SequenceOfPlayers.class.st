@@ -14,7 +14,7 @@ SequenceOfPlayers class >> with: players [
 ]
 
 { #category : #actions }
-SequenceOfPlayers >> assertIfItsPlaying: aPlayerName [
+SequenceOfPlayers >> assertHeIsPlaying: aPlayerName [
 	^ orderOfPlayers includes: aPlayerName. 
 ]
 

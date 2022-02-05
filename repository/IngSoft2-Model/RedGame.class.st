@@ -29,21 +29,21 @@ RedGame >> addPermanentEffect: aMove [
 ]
 
 { #category : #actions }
-RedGame >> assertCorrespondentTurn: playerName [
-	playerName = playerSequence currentPlayer
-		ifFalse: [ self error: 'cant play on anothers turn' ]
-]
-
-{ #category : #actions }
-RedGame >> assertIfGameHasEnded [
+RedGame >> assertGameHasEnded [
 	self hasEnded
 		ifTrue: [ self error: 'the game has ended' ]
 ]
 
 { #category : #actions }
-RedGame >> assertIfItsPlaying: playerName [
-	(playerSequence assertIfItsPlaying: playerName)
+RedGame >> assertHeIsPlaying: playerName [
+	(playerSequence assertHeIsPlaying: playerName)
 		ifFalse: [ self error: 'Cannot roll for a player that is not playing' ]
+]
+
+{ #category : #actions }
+RedGame >> assertItsHisTurn: playerName [
+	playerName = playerSequence currentPlayer
+		ifFalse: [ self error: 'cant play on anothers turn' ]
 ]
 
 { #category : #actions }
@@ -88,7 +88,7 @@ RedGame >> lapOf: playerName [
 
 { #category : #actions }
 RedGame >> play: aMove [
-	self assertIfGameHasEnded.
+	self assertGameHasEnded.
 	cardDealer handle: aMove with: self.
 ]
 
@@ -110,9 +110,9 @@ RedGame >> removePermanentEffect: aMove [
 { #category : #actions }
 RedGame >> rollDiceFor: playerName [
 	| permanentCardsResult rollValue |
-	self assertIfGameHasEnded.
-	self assertIfItsPlaying: playerName.
-	self assertCorrespondentTurn: playerName.
+	self assertGameHasEnded.
+	self assertHeIsPlaying: playerName.
+	self assertItsHisTurn: playerName.
 	self assertLastToRoll: playerName. 
 	rollValue := dieHandle roll .
 	permanentCardsResult := cardDealer

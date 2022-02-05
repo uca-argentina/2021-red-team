@@ -682,6 +682,14 @@ RedGameTest >> testCannotCreateABoardWithoutPlayers [
 ]
 
 { #category : #tests }
+RedGameTest >> testCannotCreateADeckWithoutCards [
+	cardsDistribution := OrderedCollection new.
+	cardsDistribution
+		add: (DiscreteProbabilityEvent of: OverloadCard new with: 1).
+	self should: [Deck with: (RandomSource basedOn: cardsDistribution) andSize: 0] raise: Error withMessage: 'Cant create a Deck without cards'.
+]
+
+{ #category : #tests }
 RedGameTest >> testCannotCreateADieHandleWithoutDice [
 	| dice |
 	dice := Array new.
@@ -829,7 +837,7 @@ RedGameTest >> testCannotCreateARandomSourceWithEventsProbabilitiesWhichDontSum1
 ]
 
 { #category : #tests }
-RedGameTest >> testCannotCreateARandomSourceWithoutAEventsDistribution [
+RedGameTest >> testCannotCreateARandomSourceWithoutAnEventsDistribution [
 	self
 		should: [ RandomSource basedOn: OrderedCollection new ]
 		raise: Error
@@ -871,11 +879,10 @@ RedGameTest >> testCannotDuplicateTheEffectOfACardThatHasntBeenPlayed [
 		with: (Move from: 'juan' with: OverloadCard new) against: 'martin'.
 	move := TargetedMove
 		with: (Move from: 'juan' with: SpeedBoostCard new) against: objectiveMove .
-	
 	self
 		should: [ game play: move ]
 		raise: Error
-		withMessage: 'Cant use SpeedBoost over a card that wasnt played or that isnt permanent'.
+		withMessage: 'Cant use SpeedBoost over a permanent card that isnt active or over a non-permanent card'.
 ]
 
 { #category : #tests }
@@ -1271,7 +1278,7 @@ RedGameTest >> testCannotUseASpeedBoostCardOverANonPermanentCard [
 	self
 		should: [ game play: move ]
 		raise: Error
-		withMessage: 'Cant use SpeedBoost over a card that wasnt played or that isnt permanent'.
+		withMessage: 'Cant use SpeedBoost over a permanent card that isnt active or over a non-permanent card'.
 ]
 
 { #category : #tests }
@@ -1431,28 +1438,6 @@ RedGameTest >> testCardsNoLongerInActiveLoadedDeckWhenAssigned [
 		andWith: amountOfInitialCards.
 	self assert: deck sizeOfActiveDeck equals: 0.
 	self assert: deck sizeOfDiscardedDeck equals: 0.
-]
-
-{ #category : #tests }
-RedGameTest >> testCreateAnActiveAndADiscardedDeck [
-	| deck|
-	deck := self randomDeckOfSize: 50.
-	self assert: (deck sizeOfActiveDeck) equals: 50.
-	self assert: (deck sizeOfDiscardedDeck) equals: 0.
-]
-
-{ #category : #tests }
-RedGameTest >> testCreateAnActiveAndADiscardedLoadedDeck [
-	|  deck  cards  |
-	cards := OrderedCollection new.
-	cards
-		add: RedoCard new;
-		add: OverloadCard new;
-		add: SpeedCard new;
-		add: RedoCard new.
-	deck := LoadedDeck with: cards.
-	self assert: (deck sizeOfActiveDeck) equals: 4.
-	self assert: (deck sizeOfDiscardedDeck) equals: 0.
 ]
 
 { #category : #tests }
@@ -1837,7 +1822,7 @@ RedGameTest >> testPlayAnInstantCardWhenItsNotYourTurn [
 ]
 
 { #category : #tests }
-RedGameTest >> testPlayingARepeatCardHasNoEffectIfAnyoneRollsTheDice [
+RedGameTest >> testPlayingARepeatCardHasNoEffectIfNoOneHasRolledTheDice [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck move amountOfInitialCards |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
