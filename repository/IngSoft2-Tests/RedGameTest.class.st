@@ -1364,12 +1364,12 @@ RedGameTest >> testCardsGoToTheDiscardedLoadedDeckWhenPlayed [
 	game finishTurn.
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-	self assert: deck sizeOfActiveDeck equals: 0.
+	self assert: deck sizeOfDrawDeck equals: 0.
 	self assert: deck sizeOfDiscardedDeck equals: 3.
 ]
 
 { #category : #tests }
-RedGameTest >> testCardsNoLongerInActiveDeckWhenAssigned [
+RedGameTest >> testCardsNoLongerInDrawDeckWhenAssigned [
 	| aDieHandle players fifteenCells aCircularBoard game deck move amountOfInitialCards die dice |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
@@ -1407,12 +1407,12 @@ RedGameTest >> testCardsNoLongerInActiveDeckWhenAssigned [
 	game play: move.
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-	self assert: deck sizeOfActiveDeck equals: 0.
+	self assert: deck sizeOfDrawDeck equals: 0.
 	self assert: deck sizeOfDiscardedDeck equals: 2.
 ]
 
 { #category : #tests }
-RedGameTest >> testCardsNoLongerInActiveLoadedDeckWhenAssigned [
+RedGameTest >> testCardsNoLongerInDrawLoadedDeckWhenAssigned [
 	| aDieHandle players fifteenRegularCells aCircularBoard game deck cards  amountOfInitialCards|
 	cards := OrderedCollection new.
 	cards
@@ -1436,7 +1436,7 @@ RedGameTest >> testCardsNoLongerInActiveLoadedDeckWhenAssigned [
 		withLaps: 1
 		with: players
 		andWith: amountOfInitialCards.
-	self assert: deck sizeOfActiveDeck equals: 0.
+	self assert: deck sizeOfDrawDeck equals: 0.
 	self assert: deck sizeOfDiscardedDeck equals: 0.
 ]
 
@@ -1510,7 +1510,7 @@ RedGameTest >> testLandOnAnAtomicBombCellAndStayOnCurrentLap [
 ]
 
 { #category : #tests }
-RedGameTest >> testNewActiveDeckCreatedFromTheDiscardedDeck [
+RedGameTest >> testNewDrawDeckCreatedFromTheDiscardedDeck [
 	| aDieHandle players  aCircularBoard game deck move amountOfInitialCards sixteenCells |
 	cardsDistribution := OrderedCollection new.
 	cardsDistribution
@@ -1548,12 +1548,12 @@ RedGameTest >> testNewActiveDeckCreatedFromTheDiscardedDeck [
 	game finishTurn.
 	game rollDiceFor: 'martin'.
 	game finishTurn.
-	self assert: deck sizeOfActiveDeck equals: 1.
+	self assert: deck sizeOfDrawDeck equals: 1.
 	self assert: deck sizeOfDiscardedDeck equals: 0.
 ]
 
 { #category : #tests }
-RedGameTest >> testNewActiveLoadedDeckCreatedFromTheDiscardedLoadedDeck [
+RedGameTest >> testNewDrawLoadedDeckCreatedFromTheDiscardedLoadedDeck [
 	| aDieHandle players fifteenCells aCircularBoard game deck move cards amountOfInitialCards |
 	cards := OrderedCollection new.
 	cards
@@ -1595,7 +1595,7 @@ RedGameTest >> testNewActiveLoadedDeckCreatedFromTheDiscardedLoadedDeck [
 	game play: move.
 	game rollDiceFor: 'juan'.
 	game finishTurn.
-	self assert: deck sizeOfActiveDeck equals: 2.
+	self assert: deck sizeOfDrawDeck equals: 2.
 	self assert: deck sizeOfDiscardedDeck equals: 0.
 ]
 

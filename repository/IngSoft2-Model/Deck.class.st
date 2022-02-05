@@ -3,8 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'cardsSource',
-		'activeDeck',
-		'discardedDeck'
+		'discardedDeck',
+		'drawDeck'
 	],
 	#category : #'IngSoft2-Model'
 }
@@ -29,22 +29,17 @@ Deck >> discardedDeckIsEmpty [
 { #category : #initialize }
 Deck >> initializeWith: aRandomSource andWith: amountOfCards [
 	cardsSource:= aRandomSource.
-	activeDeck := cardsSource produce: amountOfCards.
+	drawDeck := cardsSource produce: amountOfCards.
 	discardedDeck := OrderedCollection new.
 ]
 
 { #category : #actions }
-Deck >> remakeActiveDeckIfEmpty [
+Deck >> remakeDrawDeckIfEmpty [
 	| auxDeck |
-	activeDeck ifEmpty: [ self discardedDeckIsEmpty. 
+	drawDeck ifEmpty: [ self discardedDeckIsEmpty. 
 		auxDeck := discardedDeck shuffled.
-		activeDeck := auxDeck.
+		drawDeck := auxDeck.
 		discardedDeck removeAll]
-]
-
-{ #category : #queries }
-Deck >> sizeOfActiveDeck [
-	^ activeDeck size.
 ]
 
 { #category : #queries }
@@ -52,8 +47,13 @@ Deck >> sizeOfDiscardedDeck [
 	^ discardedDeck size.
 ]
 
+{ #category : #queries }
+Deck >> sizeOfDrawDeck [
+	^ drawDeck size.
+]
+
 { #category : #actions }
 Deck >> takeACard [
-	self remakeActiveDeckIfEmpty.
-	^ activeDeck removeFirst.
+	self remakeDrawDeckIfEmpty.
+	^ drawDeck removeFirst.
 ]
